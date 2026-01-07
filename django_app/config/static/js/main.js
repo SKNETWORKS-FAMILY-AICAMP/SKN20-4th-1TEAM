@@ -35,12 +35,12 @@ async function sendMessage() {
 
     try {
         // API 호출 (Django 백엔드)
-        const response = await fetch(`${API_BASE_URL}/chat/`, {
+        const formData = new FormData();
+        formData.append('question', message);
+        
+        const response = await fetch(`${API_BASE_URL}/chat/ask/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: message })
+            body: formData
         });
 
         if (!response.ok) {
