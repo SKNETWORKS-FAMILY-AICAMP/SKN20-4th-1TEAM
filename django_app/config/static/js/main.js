@@ -51,7 +51,7 @@ async function sendMessage() {
 
         // 로딩 메시지 제거 후 봇 응답 표시
         removeLoadingMessage(loadingId);
-        addMessage(data.response, 'bot');
+        addMessage(data.answer, 'bot');
 
     } catch (error) {
         console.error('Error:', error);
