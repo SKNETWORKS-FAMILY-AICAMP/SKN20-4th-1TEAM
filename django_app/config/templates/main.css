@@ -379,6 +379,8 @@ body.sidebar-collapsed .main-content {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    position: relative;
+    /* 자식 요소(placeholder)의 기준점 설정 */
 }
 
 /* =============================================
@@ -393,20 +395,24 @@ body.sidebar-collapsed .main-content {
 }
 
 /* 스크롤바 스타일 */
-.chat-container::-webkit-scrollbar {
+.chat-container::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
     width: 6px;
 }
 
-.chat-container::-webkit-scrollbar-track {
+.chat-container::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.chat-container::-webkit-scrollbar-thumb {
+.chat-container::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
     background-color: var(--color-border);
     border-radius: 3px;
 }
 
-.chat-container::-webkit-scrollbar-thumb:hover {
+.chat-container::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-primary-light);
 }
 
@@ -752,6 +758,15 @@ body.sidebar-collapsed .main-content {
     height: 20px;
 }
 
+/* Sending State (Stop Icon) */
+.send-btn.sending .icon-send {
+    display: none;
+}
+
+.send-btn.sending .icon-stop {
+    display: block !important;
+}
+
 /* =============================================
    13. 모달 (도움말)
    ============================================= */
@@ -788,6 +803,8 @@ body.sidebar-collapsed .main-content {
     position: relative;
     transform: translateY(-20px);
     transition: transform 0.3s;
+    overflow: visible;
+    /* X버튼 외부 표시를 위해 visible */
 }
 
 .modal-overlay.active .modal-content {
@@ -796,29 +813,39 @@ body.sidebar-collapsed .main-content {
 
 .modal-close {
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    top: -40px;
+    /* 외부로 이동 */
+    right: -40px;
+    /* 외부로 이동 */
     width: 36px;
     height: 36px;
     border: none;
-    background: var(--color-background-start);
-    color: var(--color-text);
-    font-size: 24px;
+    background: transparent;
+    /* 배경 투명 (글자만 보이게 하거나, 원하면 배경색 추가) */
+    color: var(--color-white);
+    /* 어두운 오버레이 위이므로 흰색 */
+    font-size: 32px;
     line-height: 1;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: transform 0.2s;
 }
 
 .modal-close:hover {
-    background-color: var(--color-border);
+    background-color: transparent;
+    transform: scale(1.1);
 }
 
 .modal-body {
     padding: var(--spacing-xl);
-    padding-top: calc(var(--spacing-xl) + 20px);
+    /* padding-top: calc(var(--spacing-xl) + 20px); X버튼 밖으로 나갔으므로 상단 패딩 축소 가능 */
     overflow-y: auto;
     line-height: 1.6;
+
+    /* 스크롤바가 라운드와 겹치지 않게 하기 위해 마진을 주고, 높이를 제한 */
+    margin: var(--spacing-sm) 0;
+    max-height: calc(80vh - 40px);
+    /* modal-content 높이 안에서 계산 */
 }
 
 .modal-body h1 {
@@ -899,7 +926,7 @@ body.sidebar-collapsed .main-content {
         margin-left: 0;
     }
 
-    .main-header .menu-toggle-btn {
+    .header-toggle-btn {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -913,7 +940,7 @@ body.sidebar-collapsed .main-content {
         transition: background-color 0.2s;
     }
 
-    .main-header .menu-toggle-btn:hover {
+    .header-toggle-btn:hover {
         background-color: var(--color-border);
     }
 
@@ -974,4 +1001,107 @@ body.sidebar-collapsed .main-content {
     .modal-body h1 {
         font-size: 1.2em;
     }
+
+    /* 모바일에서는 X버튼 안으로 복귀 */
+    .modal-close {
+        top: 10px;
+        right: 10px;
+        color: var(--color-text);
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-content {
+        overflow: hidden;
+        /* 모바일은 둥근 모서리 유지 */
+    }
+}
+
+/* =============================================
+   16. Cover Page (추가됨)
+   ============================================= */
+.cover-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e0f4f8 0%, #d0eee8 100%);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+.cover-page.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.cover-content h1 {
+    font-size: 3rem;
+    color: var(--color-primary-dark);
+    margin-bottom: var(--spacing-md);
+}
+
+.cover-content p {
+    font-size: 1.5rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-xl);
+}
+
+.start-btn {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.start-btn:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+/* =============================================
+   17. Chat Placeholder (nyang.png)
+   ============================================= */
+.chat-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    pointer-events: none;
+    /* 클릭 통과 (필요 시) */
+    text-align: center;
+}
+
+.chat-placeholder.hidden {
+    display: none !important;
+}
+
+.placeholder-image {
+    width: 200px;
+    height: auto;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.8;
+}
+
+.chat-placeholder p {
+    font-size: 1.2rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
 }

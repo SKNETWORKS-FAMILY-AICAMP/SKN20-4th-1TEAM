@@ -14,6 +14,32 @@ const API_BASE_URL = '';  // 같은 origin이면 빈 문자열
 const AVATAR_IMG_PATH = window.AVATAR_IMG_PATH || '/static/assets/images/avatar.png';
 
 // ==========================================
+// 페이지 전환 함수 (Cover -> Chat)
+// ==========================================
+function startChat() {
+    const coverPage = document.getElementById('cover-page');
+    if (coverPage) {
+        coverPage.classList.add('hidden');
+    }
+}
+
+// ==========================================
+// Placeholder(냥이) 제어 함수
+// ==========================================
+function showChatPlaceholder() {
+    const placeholder = document.getElementById('chat-placeholder');
+    const container = document.getElementById('chat-container');
+
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (container) container.innerHTML = ''; // 채팅 초기화
+}
+
+function hideChatPlaceholder() {
+    const placeholder = document.getElementById('chat-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
+}
+
+// ==========================================
 // 메시지 전송 함수
 // ==========================================
 async function sendMessage() {
@@ -23,9 +49,14 @@ async function sendMessage() {
 
     if (!message) return;
 
+    // 메시지 전송 시 냥이 숨김 (가장 먼저 실행)
+    hideChatPlaceholder();
+
     // 버튼 비활성화 (중복 전송 방지)
     sendBtn.disabled = true;
+    sendBtn.classList.add('sending'); // 아이콘 변경 (비행기 -> 네모)
 
+    // 레퍼런스: sendMessage 함수 시작 부분
     // 사용자 메시지 표시
     addMessage(message, 'user');
     input.value = '';
@@ -60,6 +91,7 @@ async function sendMessage() {
     } finally {
         // 버튼 다시 활성화
         sendBtn.disabled = false;
+        sendBtn.classList.remove('sending'); // 아이콘 복구
         input.focus();
     }
 }
@@ -143,18 +175,13 @@ function escapeHtml(text) {
 function handleNewChat() {
     console.log('새 채팅 버튼 클릭');
     if (confirm('새로운 채팅을 시작하시겠습니까?')) {
-        const container = document.getElementById('chat-container');
-        container.innerHTML = `
-            <div class="message bot-message">
-                <div class="avatar">
-                    <img src="${AVATAR_IMG_PATH}" alt="봇 아바타" onerror="this.style.display='none'; this.parentElement.classList.add('avatar-placeholder');">
-                </div>
-                <div class="message-bubble">
-                    <p>안녕하세요!</p>
-                    <p>어떤 도움이 필요하신가요?</p>
-                </div>
-            </div>
-        `;
+        showChatPlaceholder(); // 냥이 표시 및 채팅 초기화
+
+        // 커버 페이지가 혹시라도 켜져 있다면 숨김 처리 (안전장치)
+        const coverPage = document.getElementById('cover-page');
+        if (coverPage && !coverPage.classList.contains('hidden')) {
+            coverPage.classList.add('hidden');
+        }
     }
 }
 
@@ -294,6 +321,21 @@ function closeHelpModal(event) {
 }
 
 // ==========================================
+// 맞춤 설정 모달 기능
+// ==========================================
+function handleSettings() {
+    const modal = document.getElementById('settings-modal');
+    modal.classList.add('active');
+    console.log('설정 모달 열림');
+}
+
+function closeSettingsModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('settings-modal');
+    modal.classList.remove('active');
+}
+
+// ==========================================
 // 이벤트 리스너 초기화
 // ==========================================
 document.addEventListener('DOMContentLoaded', function () {
@@ -319,6 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeHelpModal();
+            closeSettingsModal();
             // 사이드바도 닫기 (모바일)
             const sidebar = document.getElementById('sidebar');
             if (sidebar && sidebar.classList.contains('open')) {

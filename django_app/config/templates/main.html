@@ -12,9 +12,18 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
-<body>
+<body class="sidebar-collapsed">
+    <!-- ===== COVER PAGE ===== -->
+    <div id="cover-page" class="cover-page">
+        <div class="cover-content">
+            <h1>청년이음</h1>
+            <p>청년들을 위한 맞춤형 정책 멘토</p>
+            <button class="start-btn" onclick="startChat()">시작하기</button>
+        </div>
+    </div>
+
     <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar collapsed" id="sidebar">
         <div class="sidebar-header">
             <button class="sidebar-toggle" onclick="toggleSidebar()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -57,6 +66,16 @@
         </div>
 
         <div class="sidebar-footer">
+            <button class="nav-item" id="btn-settings-sidebar" onclick="handleSettings()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+                <span>맞춤 설정</span>
+            </button>
             <button class="nav-item" id="btn-font-size-sidebar" onclick="handleFontSize()">
                 <span class="icon-text">Aa</span>
                 <span>글씨 크기 조절</span>
@@ -97,18 +116,13 @@
 
         <!-- ===== CHAT WRAPPER ===== -->
         <div class="chat-wrapper">
+            <!-- ===== CHAT PLACEHOLDER (nyang.png) ===== -->
+            <div id="chat-placeholder" class="chat-placeholder">
+                <img src="{% static 'assets/images/nyang.png' %}" alt="안녕냥" class="placeholder-image">
+                <p>무엇이든 물어보세요!</p>
+            </div>
+
             <main class="chat-container" id="chat-container">
-                <!-- 봇 초기 메시지 -->
-                <div class="message bot-message">
-                    <div class="avatar">
-                        <img src="{% static 'assets/images/avatar.png' %}" alt="봇 아바타"
-                            onerror="this.style.display='none'; this.parentElement.classList.add('avatar-placeholder');">
-                    </div>
-                    <div class="message-bubble">
-                        <p>안녕하세요!</p>
-                        <p>어떤 도움이 필요하신가요?</p>
-                    </div>
-                </div>
                 <!-- 메시지들이 여기에 동적으로 추가됨 -->
             </main>
 
@@ -131,10 +145,16 @@
                     <textarea id="message-input" class="message-input" placeholder="청년 정책에 대해 무엇이든 물어보세요!" rows="1"
                         autocomplete="off"></textarea>
                     <button class="send-btn" id="send-btn" onclick="sendMessage()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Send Icon -->
+                        <svg class="icon-send" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        <!-- Stop Icon -->
+                        <svg class="icon-stop" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                            stroke="none" style="display: none;">
+                            <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
                         </svg>
                     </button>
                 </div>
@@ -148,6 +168,17 @@
             <button class="modal-close" onclick="closeHelpModal()">&times;</button>
             <div class="modal-body" id="help-content">
                 <!-- 도움말 내용이 여기에 로드됨 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SETTINGS MODAL ===== -->
+    <div class="modal-overlay" id="settings-modal" onclick="closeSettingsModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            <div class="modal-body" id="settings-content">
+                <h1>맞춤 설정</h1>
+                <p>여기에 추후 설정 관련 내용이 추가될 예정입니다.</p>
             </div>
         </div>
     </div>
