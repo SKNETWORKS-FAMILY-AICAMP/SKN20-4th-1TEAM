@@ -1,195 +1,34 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="청년이음 - RAG 기반 청년 맞춤형 복지 정책 챗봇">
-    <title>청년이음 - 청년 정책 챗봇</title>
-    <link rel="stylesheet" href="/chat/main.css">
-    <!-- Markdown 렌더링 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>청년이음 - 메인</title>
+    <link rel="stylesheet" href="/main.css"> <!-- URL 설정 필요 -->
 </head>
 
-<body class="sidebar-collapsed">
-    <!-- ===== COVER PAGE ===== -->
-    <div id="cover-page" class="cover-page">
-        <div class="cover-content">
-            <h1>청년이음</h1>
-            <p>청년들을 위한 맞춤형 정책 멘토</p>
-            <button class="start-btn" onclick="startChat()">시작하기</button>
+<body>
+    <div class="landing-container">
+        <!-- 냥이 캐릭터 이미지 -->
+        <img src="/static/assets/images/nyang.png" alt="청년이음 냥이" class="character-img">
+
+        <h1 class="main-title">청년이음</h1>
+        <p class="sub-title">청년을 위한 맞춤형 정책 가이드</p>
+
+        <div class="button-group">
+            <button class="menu-btn chatbot-btn" onclick="goToChat()">
+                <span class="btn-icon">🤖</span>
+                <span class="btn-text">챗봇</span>
+            </button>
+            <button class="menu-btn search-btn" onclick="goToSearch()">
+                <span class="btn-icon">🔍</span>
+                <span class="btn-text">검색</span>
+            </button>
         </div>
     </div>
 
-    <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar collapsed" id="sidebar">
-        <div class="sidebar-header">
-            <button class="sidebar-toggle" onclick="toggleSidebar()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-
-        <nav class="sidebar-nav">
-            <button class="nav-item" id="btn-new-chat-sidebar" onclick="handleNewChat()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-                <span>대화 새로 시작하기</span>
-            </button>
-            <button class="nav-item" id="btn-help-sidebar" onclick="handleHelp()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-                <span>이용 가이드</span>
-            </button>
-        </nav>
-
-        <div class="sidebar-section">
-            <h3 class="section-title">Chats</h3>
-            <ul class="chat-history-list">
-                <!-- 하드코딩된 채팅 기록 (백엔드 연동 전 플레이스홀더) -->
-                <li class="history-item active">충북거주, 중독 예방 프로그램</li>
-                <li class="history-item">서울 월세 지원</li>
-                <li class="history-item">서울 창업 지원 추천</li>
-                <li class="history-item">부산 자격시험 응시료 지원</li>
-            </ul>
-        </div>
-
-        <div class="sidebar-footer">
-            <button class="nav-item" id="btn-settings-sidebar" onclick="handleSettings()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                <span>맞춤 설정</span>
-            </button>
-            <button class="nav-item" id="btn-font-size-sidebar" onclick="handleFontSize()">
-                <span class="icon-text">Aa</span>
-                <span>글씨 크기 조절</span>
-            </button>
-            <button class="nav-item" id="btn-save-sidebar" onclick="handleSave()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                    <polyline points="17 21 17 13 7 13 7 21" />
-                    <polyline points="7 3 7 8 15 8" />
-                </svg>
-                <span>대화 내용 저장</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- ===== SIDEBAR OVERLAY (모바일용) ===== -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="main-content">
-        <!-- 상단 로고 영역 -->
-        <div class="main-header">
-            <!-- 사이드바가 접혔을 때 표시되는 햄버거 버튼 -->
-            <button class="header-toggle-btn" onclick="toggleSidebar()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <div class="logo">
-                <img src="{% static 'assets/images/logo.png' %}" alt="청년이음 로고"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <span class="logo-text" style="display:none;">청년이음</span>
-            </div>
-        </div>
-
-        <!-- ===== CHAT WRAPPER ===== -->
-        <div class="chat-wrapper">
-            <!-- ===== CHAT PLACEHOLDER (nyang.png) ===== -->
-            <div id="chat-placeholder" class="chat-placeholder">
-                <img src="{% static 'assets/images/nyang.png' %}" alt="안녕냥" class="placeholder-image">
-                <p>무엇이든 물어보세요!</p>
-            </div>
-
-            <main class="chat-container" id="chat-container">
-                <!-- 메시지들이 여기에 동적으로 추가됨 -->
-            </main>
-
-            <!-- 추천 질문 영역 (하드코딩) -->
-            <div class="suggestion-area">
-                <h3 class="suggestion-title">추천 질문</h3>
-                <div class="suggestion-container">
-                    <button class="suggestion-card" onclick="setInputValue('청년 주거 지원 정책 뭐가 있어?')">청년 주거 지원 정책 뭐가
-                        있어?</button>
-                    <button class="suggestion-card" onclick="setInputValue('서울에서 취업 준비 중인 청년이 받을 수 있는 혜택 알려줘')">서울에서 취업
-                        준비 중인 청년이 받을 수 있는 혜택 알려줘</button>
-                    <button class="suggestion-card" onclick="setInputValue('서울에서 거주해야 하는데, 관련 생활비 지원 정책 있어?')">서울에서 거주해야
-                        하는데, 관련 생활비 지원 정책 있어?</button>
-                </div>
-            </div>
-
-            <!-- ===== INPUT AREA ===== -->
-            <footer class="input-area">
-                <div class="input-wrapper">
-                    <textarea id="message-input" class="message-input" placeholder="청년 정책에 대해 무엇이든 물어보세요!" rows="1"
-                        autocomplete="off"></textarea>
-                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
-                        <!-- Send Icon -->
-                        <svg class="icon-send" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                        <!-- Stop Icon -->
-                        <svg class="icon-stop" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
-                            stroke="none" style="display: none;">
-                            <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
-                        </svg>
-                    </button>
-                </div>
-            </footer>
-        </div>
-    </div>
-
-    <!-- ===== HELP MODAL ===== -->
-    <div class="modal-overlay" id="help-modal" onclick="closeHelpModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeHelpModal()">&times;</button>
-            <div class="modal-body" id="help-content">
-                <!-- 도움말 내용이 여기에 로드됨 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== SETTINGS MODAL ===== -->
-    <div class="modal-overlay" id="settings-modal" onclick="closeSettingsModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
-            <div class="modal-body" id="settings-content">
-                <h1>맞춤 설정</h1>
-                <p>여기에 추후 설정 관련 내용이 추가될 예정입니다.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== JAVASCRIPT ===== -->
-    <!-- Django static 경로를 JS에 전달 -->
-    <script>
-        window.AVATAR_IMG_PATH = "{% static 'assets/images/avatar.png' %}";
-    </script>
-    <!-- 외부 JS 파일 로드 -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="/static/js/main.js"></script>
 </body>
 
 </html>

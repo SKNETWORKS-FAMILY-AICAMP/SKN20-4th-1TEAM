@@ -7,6 +7,21 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from .models import SessionUser, Question, Answer
 
+def main_page(request):
+    """
+    메인 페이지 렌더링
+    """
+    return render(request, 'main.html')
+
+def serve_main_css(request):
+    """
+    templates 폴더의 CSS 파일 서빙
+    """
+    css_path = os.path.join(settings.BASE_DIR, 'templates', 'main.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css_content = f.read()
+    return HttpResponse(css_content, content_type='text/css')
+
 def run_rag(prompt):
     """
     RAG 파이프라인 호출 (임시 더미 함수)
@@ -15,17 +30,17 @@ def run_rag(prompt):
     # TODO: 실제 RAG 모듈 연결
     return f"[RAG 응답] {prompt}에 대한 답변입니다."
 
-def main_page(request):
+def chat_page(request):
     """
-    메인 페이지 렌더링
+    채팅 페이지 렌더링
     """
-    return render(request, 'main.html')
+    return render(request, 'chat.html')
 
-def serve_css(request):
+def serve_chat_css(request):
     """
     templates 폴더의 CSS 파일 서빙
     """
-    css_path = os.path.join(settings.BASE_DIR, 'templates', 'main.css')
+    css_path = os.path.join(settings.BASE_DIR, 'templates', 'chat.css')
     with open(css_path, 'r', encoding='utf-8') as f:
         css_content = f.read()
     return HttpResponse(css_content, content_type='text/css')

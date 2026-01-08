@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import ask_question, main_page, serve_css
+from .views import ask_question, chat_page, serve_chat_css
 
 urlpatterns = [
-    path("", main_page, name="main"),  # 메인 페이지
+    path("", chat_page, name="chat"),  # 챗 페이지
     path("ask/", ask_question, name="ask"),
-    path("main.css", serve_css, name="css"),  # CSS 파일
+    path("chat.css", serve_chat_css, name="css"),  # CSS 파일
 ]
