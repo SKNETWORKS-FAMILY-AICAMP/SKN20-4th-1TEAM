@@ -293,6 +293,19 @@ function closeHelpModal(event) {
     modal.classList.remove('active');
 }
 
+function handleSearchModal() {
+    const modal = document.getElementById('search-modal');
+    // Ensure the content is visible (if hidden by default styles)
+    modal.classList.add('active');
+    console.log('검색 모달 열림');
+}
+
+function closeSearchModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('search-modal');
+    modal.classList.remove('active');
+}
+
 // ==========================================
 // 이벤트 리스너 초기화
 // ==========================================
@@ -319,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeHelpModal();
+            closeSearchModal();
             // 사이드바도 닫기 (모바일)
             const sidebar = document.getElementById('sidebar');
             if (sidebar && sidebar.classList.contains('open')) {
@@ -366,4 +380,139 @@ function setInputValue(text) {
         input.value = text;
         input.focus();
     }
+}
+
+// ==========================================
+// 상세 검색 기능
+// ==========================================
+
+// 1. 상세검색 패널 토글
+function toggleDetailSearch() {
+    const panel = document.getElementById('search-filter-panel');
+    const btn = document.getElementById('toggle-detail-btn');
+
+    if (panel.classList.contains('hidden')) {
+        // 열기
+        panel.classList.remove('hidden');
+        btn.classList.add('active');
+        btn.innerHTML = `
+            상세검색 닫기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        `;
+        btn.style.backgroundColor = "#003366";
+        btn.style.color = "white";
+    } else {
+        // 닫기
+        panel.classList.add('hidden');
+        btn.classList.remove('active');
+        btn.innerHTML = `
+            상세검색 열기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+        `;
+        btn.style.backgroundColor = "white";
+        btn.style.color = "#003366";
+    }
+}
+
+// 2. 필터 버튼 클릭 이벤트 (단일 선택 / 다중 선택 로직)
+document.addEventListener('DOMContentLoaded', function () {
+    // tag-btn을 가진 모든 버튼에 대해 이벤트 리스너 추가
+    const tagBtns = document.querySelectorAll('.tag-btn');
+
+    tagBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            // 부모 컨테이너 찾기
+            const parent = this.parentElement;
+
+            // "제한없음" 버튼인지 확인
+            const isNoLimit = this.textContent.trim() === '제한없음';
+
+            if (isNoLimit) {
+                // "제한없음" 클릭 시: 다른 모든 버튼 선택 해제하고 자기 자신만 활성화
+                const siblings = parent.querySelectorAll('.tag-btn');
+                siblings.forEach(sib => sib.classList.remove('active'));
+                this.classList.add('active');
+            } else {
+                // 일반 버튼 클릭 시
+                // 1. "제한없음" 버튼 해제
+                const noLimitBtn = Array.from(parent.querySelectorAll('.tag-btn')).find(b => b.textContent.trim() === '제한없음');
+                if (noLimitBtn) noLimitBtn.classList.remove('active');
+
+                // 2. 토글 (이미 활성화되어 있으면 해제, 아니면 활성화)
+                this.classList.toggle('active');
+
+                // 3. 만약 모든 버튼이 해제되었다면 "제한없음" 다시 활성화 (선택 사항)
+                const activeBtns = parent.querySelectorAll('.tag-btn.active');
+                if (activeBtns.length === 0 && noLimitBtn) {
+                    noLimitBtn.classList.add('active');
+                }
+            }
+        });
+    });
+});
+
+// 3. 초기화 버튼
+function resetFilters() {
+    // 텍스트/숫자 입력 초기화
+    document.querySelectorAll('.search-filter-panel input, .search-filter-panel select').forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+
+    // 버튼 초기화 ("제한없음"만 활성화)
+    document.querySelectorAll('.filter-tags').forEach(group => {
+        const btns = group.querySelectorAll('.tag-btn');
+        btns.forEach(btn => {
+            if (btn.textContent.trim() === '제한없음') {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    });
+
+    console.log('필터 초기화됨');
+}
+
+// 4. 내 정보 자동입력 (데모용 더미 데이터)
+function autoFillUserInfo() {
+    // 지역: 서울
+    const regionSelect = document.querySelector('.search-filter-panel select.filter-select:first-of-type');
+    if (regionSelect) regionSelect.value = 'seoul';
+
+    // 혼인여부: 미혼
+    const marriageSelect = document.querySelectorAll('.search-filter-panel select.filter-select')[1];
+    if (marriageSelect) marriageSelect.value = 'single';
+
+    // 연령: 24세
+    const ageInput = document.querySelector('.input-with-text input');
+    if (ageInput) ageInput.value = 24;
+
+    // 학력: 대학 재학
+    const eduGroup = document.querySelectorAll('.filter-tags')[0]; // 첫번째 태그 그룹
+    if (eduGroup) {
+        eduGroup.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('active'));
+        const targetBtn = Array.from(eduGroup.querySelectorAll('.tag-btn')).find(b => b.textContent.includes('대학 재학'));
+        if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    console.log('내 정보 자동입력 완료');
+}
+
+// 5. 검색 실행 (콘솔 로그)
+function executeSearch() {
+    const filters = {};
+
+    // 수집 로직 (구현 생략 가능하지만 확인용으로 작성)
+    filters.region = document.querySelector('.search-filter-panel select').value;
+
+    console.log('검색 실행:', filters);
+    alert('검색 조건이 적용되었습니다. (결과는 콘솔 확인)');
 }

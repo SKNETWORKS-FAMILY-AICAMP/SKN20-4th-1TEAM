@@ -975,3 +975,413 @@ body.sidebar-collapsed .main-content {
         font-size: 1.2em;
     }
 }
+
+/* =============================================
+   14. 검색 섹션 (Advanced Search)
+   ============================================= */
+.search-section {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    padding-bottom: 0;
+}
+
+.search-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text);
+}
+
+/* 검색 바 컨테이너 */
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.search-options {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    user-select: none;
+}
+
+.checkbox-label input {
+    display: none;
+}
+
+.checkbox-box {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--color-text-muted);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background-color: var(--color-white);
+}
+
+.checkbox-label input:checked+.checkbox-box {
+    background-color: var(--color-text);
+    border-color: var(--color-text);
+}
+
+.checkbox-label input:checked+.checkbox-box::after {
+    content: '✔';
+    color: white;
+    font-size: 12px;
+}
+
+/* 메인 검색 입력창 */
+.search-input-wrapper {
+    flex: 1;
+    /* 남은 공간 차지 */
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #0056b3;
+    /* 파란색 테두리 */
+    border-radius: 50px;
+    /* 둥근 캡슐 형태 */
+    padding: 0 var(--spacing-sm);
+    background-color: white;
+    height: 48px;
+    transition: box-shadow 0.2s;
+}
+
+.search-input-wrapper:focus-within {
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+}
+
+.main-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 var(--spacing-sm);
+    font-size: var(--font-size-base);
+    background: transparent;
+}
+
+.search-icon-btn {
+    background: none;
+    border: none;
+    color: #0056b3;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 버튼 공통 스타일 */
+.refresh-btn,
+.toggle-detail-btn {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #0056b3;
+    background-color: white;
+    color: #0056b3;
+    border-radius: 50px;
+    /* 원형 또는 캡슐 */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refresh-btn {
+    width: 48px;
+    border-radius: 50%;
+}
+
+.toggle-detail-btn {
+    padding: 0 var(--spacing-md);
+    gap: 6px;
+    font-weight: 600;
+    background-color: #003366;
+    /* 남색 배경 (상세검색 닫기 상태) */
+    color: white;
+    border-color: #003366;
+}
+
+.toggle-detail-btn.active {
+    /* 닫기 상태 (현재 열려있음) -> 남색 */
+    background-color: #003366;
+    color: white;
+}
+
+.toggle-detail-btn:not(.active) {
+    /* 열기 상태 (현재 닫혀있음) -> 흰색/파란색 */
+    background-color: white;
+    color: #003366;
+}
+
+/* =============================================
+   15. 상세 검색 필터 패널
+   ============================================= */
+.search-filter-panel {
+    border: 2px solid #0056b3;
+    /* 굵은 파란색 테두리 */
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    background-color: white;
+    display: block;
+    /* JS로 토글 */
+    transition: all 0.3s ease;
+    margin-bottom: var(--spacing-lg);
+}
+
+.search-filter-panel.hidden {
+    display: none;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) 0;
+}
+
+.filter-row.dashed-top {
+    border-top: 1px dashed #e2e8f0;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.filter-label {
+    min-width: 60px;
+    font-weight: 700;
+    color: var(--color-text);
+    font-size: var(--font-size-base);
+}
+
+.select-wrapper {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    min-width: 140px;
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    outline: none;
+}
+
+.btn-dark-sm {
+    background-color: #1a202c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0 12px;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.margin-left-auto {
+    margin-left: auto;
+}
+
+.input-with-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-base);
+}
+
+.input-underline {
+    border: none;
+    border-bottom: 2px solid #e2e8f0;
+    /* 밑줄 */
+    border-bottom-style: dotted;
+    /* 점선 */
+    text-align: center;
+    padding: 4px;
+    outline: none;
+    color: #e53e3e;
+    /* ajax 텍스트 색상 (예시) */
+    font-weight: 600;
+}
+
+.input-underline::placeholder {
+    color: #e53e3e;
+    opacity: 0.7;
+}
+
+.w-80 {
+    width: 80px;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-sm);
+}
+
+.input-box {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    width: 100px;
+    text-align: right;
+    outline: none;
+}
+
+/* 필터 태그 버튼들 */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+}
+
+.tag-btn {
+    padding: 6px 16px;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+    border-radius: 20px;
+    /* 캡슐형 */
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag-btn:hover {
+    background-color: var(--color-background-start);
+}
+
+.tag-btn.active {
+    border-color: #0056b3;
+    /* 파란색 테두리 */
+    color: #0056b3;
+    /* 파란색 글씨 */
+    font-weight: 600;
+    background-color: white;
+    /* 배경은 흰색 유지 (스크린샷 참조) */
+    box-shadow: 0 0 0 1px #0056b3 inset;
+    /* 테두리 조금 더 두껍게 */
+}
+
+/* 하단 액션 버튼들 */
+.search-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    background-color: #eff6ff;
+    /* 연한 파란색 배경 */
+    margin: 0 -24px -24px -24px;
+    /* 패널 패딩 무시하고 꽉 채우기 */
+    padding: 24px;
+    border-bottom-left-radius: 14px;
+    /* 패널 radius - border width */
+    border-bottom-right-radius: 14px;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary-blue {
+    background-color: #3182ce;
+    /* 밝은 파랑 */
+    color: white;
+}
+
+.btn-primary-blue:hover {
+    background-color: #2b6cb0;
+}
+
+.btn-dark {
+    background-color: #1a202c;
+    /* 검정 */
+    color: white;
+}
+
+.btn-dark:hover {
+    background-color: #000;
+}
+
+.btn-outline {
+    background-color: white;
+    border: 1px solid var(--color-text);
+    color: var(--color-text);
+}
+
+.btn-outline:hover {
+    background-color: #f7fafc;
+}
+
+/* 반응형 처리 */
+@media (max-width: 768px) {
+    .search-bar-container {
+        flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+        order: 3;
+        width: 100%;
+        margin-top: var(--spacing-sm);
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .margin-left-auto {
+        margin-left: 0;
+    }
+
+    .search-actions {
+        flex-direction: column;
+    }
+
+    .icon-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =============================================
+   16. Search Modal Specific Styles
+   ============================================= */
+.search-modal-content {
+    max-width: 900px;
+    width: 95%;
+}
+
+.modal-body .search-section {
+    padding: 0;
+    max-width: 100%;
+}
