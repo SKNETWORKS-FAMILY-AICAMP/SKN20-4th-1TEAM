@@ -40,12 +40,11 @@ function handleTransition(targetUrl, imagePath, direction) {
 }
 
 function goToChat() {
-    // 버튼1: 왼쪽으로 회전, chat.png 표시
-    handleTransition('/chat/', IMG_PATH_CHAT, 'left');
+    // 버튼1: 왼쪽으로 회전, chat.png 표시 후 chat 페이지로 이동
+    handleTransition('/chat/chat/', IMG_PATH_CHAT, 'left');
 }
 
 function goToSearch() {
-    // 버튼2: 오른쪽으로 회전, search.png 표시
-    // 페이지 이동 없이 전환 효과만 보여줌
-    handleTransition('', IMG_PATH_SEARCH, 'right');
+    // 버튼2: 오른쪽으로 회전, search.png 표시 후 search 페이지로 이동
+    handleTransition('/chat/search/', IMG_PATH_SEARCH, 'right');
 }

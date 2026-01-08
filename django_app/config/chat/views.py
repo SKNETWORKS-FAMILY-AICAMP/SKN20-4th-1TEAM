@@ -30,7 +30,12 @@ def search_page(request):
     """
     return render(request, 'search.html')
 
-def serve_css(request):
+def chat_page(request):
+    """
+    채팅 페이지 렌더링
+    """
+    return render(request, 'chat.html')
+def serve_main_css(request):
     """
     templates 폴더의 CSS 파일 서빙
     """
@@ -44,6 +49,15 @@ def serve_search_css(request):
     templates 폴더의 search.css 파일 서빙
     """
     css_path = os.path.join(settings.BASE_DIR, 'templates', 'search.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css_content = f.read()
+    return HttpResponse(css_content, content_type='text/css')
+
+def serve_chat_css(request):
+    """
+    templates 폴더의 chat.css 파일 서빙
+    """
+    css_path = os.path.join(settings.BASE_DIR, 'templates', 'chat.css')
     with open(css_path, 'r', encoding='utf-8') as f:
         css_content = f.read()
     return HttpResponse(css_content, content_type='text/css')
