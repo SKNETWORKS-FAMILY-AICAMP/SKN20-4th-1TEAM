@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="청년이음 - 청년 맞춤형 복지 정책 검색">
+    <title>청년이음 - 정책 검색</title>
+    <link rel="stylesheet" href="/chat/search.css">
+</head>
+
+<body class="sidebar-collapsed">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar collapsed" id="sidebar">
+        <div class="sidebar-header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item" id="btn-new-chat-sidebar" onclick="handleNewChat()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <span>챗봇으로 이동</span>
+            </button>
+            <button class="nav-item" id="btn-help-sidebar" onclick="openHelpModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <span>이용 가이드</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- ===== SIDEBAR OVERLAY (모바일용) ===== -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <!-- 상단 로고 영역 -->
+        <div class="main-header">
+            <button class="header-toggle-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="logo">
+                <img src="{% static 'assets/images/logo.png' %}" alt="청년이음 로고"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span class="logo-text" style="display:none;">청년이음</span>
+            </div>
+        </div>
+
+        <!-- ===== SEARCH CONTENT ===== -->
+        <div class="search-content-wrapper">
+            <div class="search-container">
+                <div class="search-section">
+                    <h2 class="search-title">청년정책 통합검색</h2>
+                    
+                    <div class="search-bar-container">
+                        <div class="search-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="exclude-closed">
+                                <span class="checkbox-box"></span>
+                                마감제외
+                            </label>
+                        </div>
+                        <div class="search-input-wrapper">
+                            <input type="text" placeholder="검색어 입력" class="main-search-input">
+                            <button class="search-icon-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="refresh-btn" onclick="resetFilters()" title="새로고침">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
+                        <button class="toggle-detail-btn active" id="toggle-detail-btn" onclick="toggleDetailSearch()">
+                            상세검색 닫기
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <path d="M18 15l-6-6-6 6"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="search-filter-panel" id="search-filter-panel">
+                        <!-- 1. Region & Marital Status -->
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="filter-label">지역</label>
+                                <div class="select-wrapper">
+                                    <button class="btn-region-select" onclick="openRegionModal()">
+                                        <span id="selected-region-text">선택하세요</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">혼인여부</label>
+                                <select class="filter-select">
+                                    <option value="">선택하세요</option>
+                                    <option value="single">미혼</option>
+                                    <option value="married">기혼</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 2. Age & Income -->
+                        <div class="filter-row dashed-top">
+                            <div class="filter-group">
+                                <label class="filter-label">연령</label>
+                                <div class="input-with-text">
+                                    만 <input type="number" class="w-80 input-underline"> 세
+                                </div>
+                            </div>
+                            <div class="filter-group margin-left-auto">
+                                <label class="filter-label">연소득<br>(만원)</label>
+                                <div class="range-inputs">
+                                    <input type="number" class="input-box" placeholder=""> 만원 이상 ~ 
+                                    <input type="number" class="input-box" placeholder=""> 만원 이하
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Education -->
+                        <div class="filter-row dashed-top">
+                            <label class="filter-label">학력</label>
+                            <div class="filter-tags">
+                                <button class="tag-btn active">제한없음</button>
+                                <button class="tag-btn">고졸 미만</button>
+                                <button class="tag-btn">고교 재학</button>
+                                <button class="tag-btn">고졸 예정</button>
+                                <button class="tag-btn">고교 졸업</button>
+                                <button class="tag-btn">대학 재학</button>
+                                <button class="tag-btn">대졸 예정</button>
+                                <button class="tag-btn">대학 졸업</button>
+                                <button class="tag-btn">석·박사</button>
+                                <button class="tag-btn">기타</button>
+                            </div>
+                        </div>
+
+                        <!-- 4. Major -->
+                        <div class="filter-row dashed-top">
+                            <label class="filter-label">전공요건</label>
+                            <div class="filter-tags">
+                                <button class="tag-btn active">제한없음</button>
+                                <button class="tag-btn">인문계열</button>
+                                <button class="tag-btn">사회계열</button>
+                                <button class="tag-btn">상경계열</button>
+                                <button class="tag-btn">이학계열</button>
+                                <button class="tag-btn">공학계열</button>
+                                <button class="tag-btn">예체능계열</button>
+                                <button class="tag-btn">농산업계열</button>
+                                <button class="tag-btn">기타</button>
+                            </div>
+                        </div>
+
+                        <!-- 5. Employment Status -->
+                        <div class="filter-row dashed-top">
+                            <label class="filter-label">취업상태</label>
+                            <div class="filter-tags">
+                                <button class="tag-btn active">제한없음</button>
+                                <button class="tag-btn">재직자</button>
+                                <button class="tag-btn">자영업자</button>
+                                <button class="tag-btn">미취업자</button>
+                                <button class="tag-btn">프리랜서</button>
+                                <button class="tag-btn">일용근로자</button>
+                                <button class="tag-btn">(예비)창업자</button>
+                                <button class="tag-btn">단기근로자</button>
+                                <button class="tag-btn">영농종사자</button>
+                                <button class="tag-btn">기타</button>
+                            </div>
+                        </div>
+
+                        <!-- 6. Specialization -->
+                        <div class="filter-row dashed-top">
+                            <label class="filter-label">특화분야</label>
+                            <div class="filter-tags">
+                                <button class="tag-btn active">제한없음</button>
+                                <button class="tag-btn">중소기업</button>
+                                <button class="tag-btn">여성</button>
+                                <button class="tag-btn">기초생활수급자</button>
+                                <button class="tag-btn">한부모가정</button>
+                                <button class="tag-btn">장애인</button>
+                                <button class="tag-btn">농업인</button>
+                                <button class="tag-btn">군인</button>
+                                <button class="tag-btn">지역인재</button>
+                                <button class="tag-btn">기타</button>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Actions -->
+                        <div class="search-actions">
+                            <button class="btn-dark icon-btn" onclick="executeSearch()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                검색
+                            </button>
+                            <button class="btn-outline icon-btn" onclick="resetFilters()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                    <path d="M3 3v5h5"></path>
+                                </svg>
+                                초기화
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SEARCH RESULTS ===== -->
+                <div class="search-results-section" id="search-results-section">
+                    <div class="results-header">
+                        <h3 class="results-title">검색 결과 <span id="results-count">0</span>건</h3>
+                    </div>
+                    <div class="results-grid" id="results-grid">
+                        <!-- 검색 결과가 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    <div class="pagination" id="pagination">
+                        <!-- 페이지네이션 버튼이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== REGION MODAL ===== -->
+    <div class="modal-overlay" id="region-modal" onclick="closeRegionModal(event)">
+        <div class="modal-content region-modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeRegionModal()">&times;</button>
+            <div class="region-modal-body">
+                <h2 class="modal-title">지역선택</h2>
+                
+                <div class="region-selection-container">
+                    <!-- 시/도 선택 -->
+                    <div class="region-column">
+                        <h3 class="region-column-title">지역</h3>
+                        <div class="region-list" id="province-list">
+                            <div class="region-item-clickable" data-value="all" data-name="전국" onclick="selectProvinceClick('all', '전국')">전국</div>
+                            <div class="region-item-clickable" data-value="seoul" data-name="서울특별시" onclick="selectProvinceClick('seoul', '서울특별시')">서울특별시</div>
+                            <div class="region-item-clickable" data-value="busan" data-name="부산광역시" onclick="selectProvinceClick('busan', '부산광역시')">부산광역시</div>
+                            <div class="region-item-clickable" data-value="daegu" data-name="대구광역시" onclick="selectProvinceClick('daegu', '대구광역시')">대구광역시</div>
+                            <div class="region-item-clickable" data-value="incheon" data-name="인천광역시" onclick="selectProvinceClick('incheon', '인천광역시')">인천광역시</div>
+                            <div class="region-item-clickable" data-value="gwangju" data-name="광주광역시" onclick="selectProvinceClick('gwangju', '광주광역시')">광주광역시</div>
+                            <div class="region-item-clickable" data-value="daejeon" data-name="대전광역시" onclick="selectProvinceClick('daejeon', '대전광역시')">대전광역시</div>
+                            <div class="region-item-clickable" data-value="ulsan" data-name="울산광역시" onclick="selectProvinceClick('ulsan', '울산광역시')">울산광역시</div>
+                            <div class="region-item-clickable" data-value="sejong" data-name="세종특별자치시" onclick="selectProvinceClick('sejong', '세종특별자치시')">세종특별자치시</div>
+                            <div class="region-item-clickable" data-value="gyeonggi" data-name="경기도" onclick="selectProvinceClick('gyeonggi', '경기도')">경기도</div>
+                            <div class="region-item-clickable" data-value="gangwon" data-name="강원도" onclick="selectProvinceClick('gangwon', '강원도')">강원도</div>
+                            <div class="region-item-clickable" data-value="chungbuk" data-name="충청북도" onclick="selectProvinceClick('chungbuk', '충청북도')">충청북도</div>
+                            <div class="region-item-clickable" data-value="chungnam" data-name="충청남도" onclick="selectProvinceClick('chungnam', '충청남도')">충청남도</div>
+                            <div class="region-item-clickable" data-value="jeonbuk" data-name="전라북도" onclick="selectProvinceClick('jeonbuk', '전라북도')">전라북도</div>
+                            <div class="region-item-clickable" data-value="jeonnam" data-name="전라남도" onclick="selectProvinceClick('jeonnam', '전라남도')">전라남도</div>
+                            <div class="region-item-clickable" data-value="gyeongbuk" data-name="경상북도" onclick="selectProvinceClick('gyeongbuk', '경상북도')">경상북도</div>
+                            <div class="region-item-clickable" data-value="gyeongnam" data-name="경상남도" onclick="selectProvinceClick('gyeongnam', '경상남도')">경상남도</div>
+                            <div class="region-item-clickable" data-value="jeju" data-name="제주특별자치도" onclick="selectProvinceClick('jeju', '제주특별자치도')">제주특별자치도</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 구/군 선택 -->
+                    <div class="region-column">
+                        <h3 class="region-column-title">전체</h3>
+                        <div class="region-list" id="district-list">
+                            <!-- 동적으로 구/군 목록이 여기에 추가됨 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 선택된 지역 표시 -->
+                <div class="selected-regions-section">
+                    <h3 class="selected-regions-title">선택된 지역</h3>
+                    <div class="selected-regions-list" id="selected-regions-display">
+                        <!-- 선택된 지역 태그들이 여기에 표시됨 -->
+                    </div>
+                </div>
+                
+                <div class="region-modal-actions">
+                    <button class="btn-outline-modal" onclick="closeRegionModal()">돌아가기</button>
+                    <button class="btn-outline-modal" onclick="resetRegionSelection()">초기화</button>
+                    <button class="btn-primary-modal" onclick="applyRegionSelection()">적용하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HELP MODAL ===== -->
+    <div class="modal-overlay" id="help-modal" onclick="closeHelpModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            <div class="modal-body" id="help-content">
+                <h1>청년이음 이용 가이드</h1>
+                <hr>
+                
+                <h2>서비스 소개</h2>
+                <p>청년이음은 청년들을 위한 맞춤형 정책 정보를 제공하는 챗봇 서비스입니다.</p>
+                <p>RAG(Retrieval-Augmented Generation) 기술을 활용하여 정확하고 신뢰할 수 있는 정책 정보를 안내합니다.</p>
+                
+                <h2>주요 기능</h2>
+                <h3>1. 챗봇 대화</h3>
+                <p>- 자연어로 질문하면 AI가 관련 청년 정책을 찾아 답변합니다.</p>
+                <p>- 주거, 취업, 창업, 교육, 복지 등 다양한 분야의 정책을 검색할 수 있습니다.</p>
+                
+                <h3>2. 정책 통합검색</h3>
+                <p>- 상세한 필터를 통해 나에게 맞는 정책을 찾을 수 있습니다.</p>
+                <p>- 지역, 연령, 학력, 소득 등 다양한 조건으로 검색 가능합니다.</p>
+                <p>- '내 정보 자동입력' 기능으로 간편하게 맞춤 검색이 가능합니다.</p>
+                
+                <h2>사용 방법</h2>
+                <h3>챗봇 이용하기</h3>
+                <p>1. 메인 화면에서 질문을 입력하세요.</p>
+                <p>2. 예: "서울에서 청년 월세 지원 정책 알려줘"</p>
+                <p>3. AI가 관련 정책 정보를 찾아 답변합니다.</p>
+                
+                <h3>검색 페이지 이용하기</h3>
+                <p>1. 상세검색 필터를 열고 내 정보를 입력하세요.</p>
+                <p>2. 각 항목을 선택하거나 '내 정보 자동입력'을 클릭하세요.</p>
+                <p>3. 검색 버튼을 눌러 맞춤 정책을 확인하세요.</p>
+                
+                <h2>문의하기</h2>
+                <p>서비스 이용 중 문의사항이 있으시면 고객센터로 연락주세요.</p>
+                <p>📧 이메일: support@youth-connect.kr</p>
+                <p>📞 전화: 1234-5678 (평일 09:00-18:00)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script src="{% static 'js/search.js' %}"></script>
+</body>
+
+</html>
