@@ -236,15 +236,16 @@ body {
 }
 
 .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-sm);
     color: var(--color-text-light);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: background-color 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    position: relative;
 }
 
 .history-item:hover {
@@ -255,6 +256,98 @@ body {
     background-color: var(--color-primary-light);
     color: var(--color-primary-dark);
     font-weight: 500;
+}
+
+.history-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.history-empty {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+    font-style: italic;
+}
+
+/* 채팅 메뉴 버튼 (⋮) */
+.chat-menu-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.history-item:hover .chat-menu-btn {
+    opacity: 1;
+}
+
+.chat-menu-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--color-text);
+}
+
+/* 드롭다운 메뉴 */
+.chat-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    min-width: 120px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+
+.chat-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.chat-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.chat-dropdown-item:hover {
+    background-color: var(--color-secondary);
+}
+
+.chat-dropdown-item.delete {
+    color: #e53e3e;
+}
+
+.chat-dropdown-item.delete:hover {
+    background-color: #fed7d7;
 }
 
 .sidebar-footer {
@@ -906,16 +999,43 @@ body.sidebar-collapsed .main-content {
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
+        width: 100%;
+        /* 모바일에서는 전체 너비 */
     }
 
     .sidebar.open {
         transform: translateX(0);
+        width: 100%;
+        /* 열릴 때도 전체 너비 유지 */
     }
 
+    /* 모바일에서 collapsed 상태 무시 - 항상 풀 너비 */
+    .sidebar.open.collapsed {
+        width: 100%;
+    }
+
+    /* 모바일에서 collapsed 상태의 nav-item 스타일 오버라이드 */
+    .sidebar.open.collapsed .nav-item {
+        justify-content: flex-start;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .sidebar.open.collapsed .nav-item span:not(.icon-text) {
+        opacity: 1;
+        width: auto;
+    }
+
+    .sidebar.open.collapsed .section-title,
+    .sidebar.open.collapsed .chat-history-list {
+        opacity: 1;
+        display: block;
+    }
+
+    /* 사이드바 안의 토글 버튼 유지 (열기/닫기 겸용) */
+
     .sidebar-close-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        display: none;
+        /* X 버튼 대신 햄버거 사용 */
     }
 
     .sidebar-overlay.active {
@@ -1051,4 +1171,11 @@ body.sidebar-collapsed .main-content {
     font-size: 1.2rem;
     color: var(--color-text-muted);
     font-weight: 600;
+}
+
+/* 모바일에서 플레이스홀더 숨김 */
+@media (max-width: 768px) {
+    .chat-placeholder {
+        display: none !important;
+    }
 }

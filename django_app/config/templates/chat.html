@@ -48,25 +48,19 @@
 
         <div class="sidebar-section">
             <h3 class="section-title">Chats</h3>
-            <ul class="chat-history-list">
-                <!-- 하드코딩된 채팅 기록 (백엔드 연동 전 플레이스홀더) -->
-                <li class="history-item active">충북거주, 중독 예방 프로그램</li>
-                <li class="history-item">서울 월세 지원</li>
-                <li class="history-item">서울 창업 지원 추천</li>
-                <li class="history-item">부산 자격시험 응시료 지원</li>
+            <ul class="chat-history-list" id="chat-history-list">
+                <!-- JavaScript에서 동적으로 렌더링됨 -->
             </ul>
         </div>
 
         <div class="sidebar-footer">
-            <button class="nav-item" id="btn-settings-sidebar" onclick="handleSettings()">
+            <button class="nav-item" id="btn-home-sidebar" onclick="location.href='/'">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <span>맞춤 설정</span>
+                <span>홈으로 가기</span>
             </button>
             <button class="nav-item" id="btn-font-size-sidebar" onclick="handleFontSize()">
                 <span class="icon-text">Aa</span>
@@ -136,7 +130,7 @@
                 <div class="input-wrapper">
                     <textarea id="message-input" class="message-input" placeholder="청년 정책에 대해 무엇이든 물어보세요!" rows="1"
                         autocomplete="off"></textarea>
-                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                    <button class="send-btn" id="send-btn" onclick="handleSendButton()">
                         <!-- Send Icon -->
                         <svg class="icon-send" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -160,17 +154,6 @@
             <button class="modal-close" onclick="closeHelpModal()">&times;</button>
             <div class="modal-body" id="help-content">
                 <!-- 도움말 내용이 여기에 로드됨 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== SETTINGS MODAL ===== -->
-    <div class="modal-overlay" id="settings-modal" onclick="closeSettingsModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
-            <div class="modal-body" id="settings-content">
-                <h1>맞춤 설정</h1>
-                <p>여기에 추후 설정 관련 내용이 추가될 예정입니다.</p>
             </div>
         </div>
     </div>

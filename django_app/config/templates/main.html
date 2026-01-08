@@ -1,34 +1,48 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>청년이음 - 메인</title>
-    <link rel="stylesheet" href="/main.css"> <!-- URL 설정 필요 -->
+    <title>청년이음</title>
+    <link rel="stylesheet" href="/main.css">
 </head>
 
 <body>
-    <div class="landing-container">
-        <!-- 냥이 캐릭터 이미지 -->
-        <img src="/static/assets/images/nyang.png" alt="청년이음 냥이" class="character-img">
+    <!-- 배경: 고정 (회전하지 않음) -->
+    <div class="background-layer"></div>
 
-        <h1 class="main-title">청년이음</h1>
-        <p class="sub-title">청년을 위한 맞춤형 정책 가이드</p>
+    <!-- 3D 회전 공간 -->
+    <div class="scene">
+        <!-- 카드 (회전 대상: 말풍선 + 버튼만) -->
+        <div class="card" id="main-card">
+            <!-- 앞면: 말풍선 + 버튼 -->
+            <div class="card-face card-front">
+                <!-- 말풍선 영역 -->
+                <div class="bubble-container">
+                    <img src="{% static 'assets/images/bubble.png' %}" alt="말풍선" class="bubble-img">
+                </div>
 
-        <div class="button-group">
-            <button class="menu-btn chatbot-btn" onclick="goToChat()">
-                <span class="btn-icon">🤖</span>
-                <span class="btn-text">챗봇</span>
-            </button>
-            <button class="menu-btn search-btn" onclick="goToSearch()">
-                <span class="btn-icon">🔍</span>
-                <span class="btn-text">검색</span>
-            </button>
+                <!-- 버튼 영역 -->
+                <div class="button-container">
+                    <button class="img-btn" onclick="goToChat()">
+                        <img src="{% static 'assets/images/button1.png' %}" alt="대화 시작하기">
+                    </button>
+                    <button class="img-btn" onclick="goToSearch()">
+                        <img src="{% static 'assets/images/button2.png' %}" alt="검색하기">
+                    </button>
+                </div>
+            </div>
+
+            <!-- 뒷면: 전환 이미지 -->
+            <div class="card-face card-back">
+                <img id="transition-img" src="" alt="전환 이미지">
+            </div>
         </div>
     </div>
 
-    <script src="/static/js/main.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 
 </html>

@@ -1,94 +1,219 @@
-/* main.css - 랜딩 페이지 스타일 */
+/* Main Landing Page Styles - Directional Rotation */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-:root {
-    --primary-color: #5CBFB3;
-    /* 민트색 */
-    --hover-color: #4AA89D;
-    --bg-gradient-start: #E0F4F8;
-    --bg-gradient-end: #C8E8DC;
-    --text-color: #2d3748;
-}
-
-body {
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Pretendard', sans-serif;
+}
+
+/* 고정 배경 레이어 (회전하지 않음) */
+.background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* 민트색 배경 + back.png 이미지 */
-    background-color: #5CBFB3;
     background-image: url('/static/assets/images/back.png');
     background-size: cover;
-    background-position: center;
+    background-position: top center;
     background-repeat: no-repeat;
-    font-family: 'Pretendard', -apple-system, sans-serif;
-    color: var(--text-color);
+    background-color: #ffffff;
+    z-index: 1;
 }
 
-.landing-container {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 3rem 4rem;
-    border-radius: 24px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 90%;
+/* 3D 공간 (원근감 설정) */
+.scene {
+    width: 100vw;
+    height: 100vh;
+    perspective: 1500px;
+    position: relative;
+    z-index: 10;
 }
 
-.main-title {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+/* 카드 (회전 대상: 화면 전체 크기 유지) */
+.card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.8s ease-in-out;
 }
 
-.sub-title {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 3rem;
+/* 카드 앞면/뒷면 공통 */
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
-.button-group {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-}
-
-.menu-btn {
+/* 앞면: 버블 + 버튼 (배경 투명) */
+.card-front {
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
     align-items: center;
-    justify-content: center;
-    width: 140px;
-    height: 140px;
-    border: none;
-    border-radius: 20px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding-bottom: 5vh;
 }
 
-.menu-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    background-color: var(--primary-color);
+/* 뒷면: 전환 이미지 (버블+버튼 위치에 맞춤) */
+.card-back {
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 5vh;
+    background: transparent;
+    /* 배경 투명 */
 }
 
-.menu-btn:hover .btn-text,
-.menu-btn:hover .btn-icon {
-    color: white;
+/* 전환 이미지: 버블+버튼 영역 크기로 제한 */
+.card-back img {
+    width: 80%;
+    max-width: 400px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    margin-bottom: 50px;
+    /* 버튼 영역과 비슷한 하단 여백 */
 }
 
-.btn-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
+/* === 회전 클래스 === */
+/* 왼쪽으로 회전 (버튼1) */
+.rotate-left {
+    transform: rotateY(-180deg);
+}
+
+/* 오른쪽으로 회전 (버튼2) */
+.rotate-right {
+    transform: rotateY(180deg);
+}
+
+/* ========================================== */
+/* 버블 + 버튼 스타일 */
+/* ========================================== */
+
+/* 말풍선 영역 */
+.bubble-container {
+    position: absolute;
+    top: 15%;
+    width: 80%;
+    max-width: 400px;
+    animation: float 3s ease-in-out infinite;
+    z-index: 10;
+    text-align: center;
+}
+
+.bubble-img {
+    width: 100%;
+    height: auto;
     display: block;
+    margin: 0 auto;
 }
 
-.btn-text {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text-color);
+/* 버튼 컨테이너 */
+.button-container {
+    display: flex;
+    flex-direction: row;
+    /* column에서 row로 변경: 항상 가로 배치 */
+    gap: 10px;
+    /* 화면이 작을 때는 간격을 좁게 조절 */
+    width: 90%;
+    /* 화면 너비에 맞춰 유동적으로 변하게 % 사용 */
+    max-width: 600px;
+    justify-content: center;
+    z-index: 10;
+    margin-bottom: 50px;
+}
+
+/* 이미지 버튼 스타일 */
+.img-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 100%;
+    display: block;
+    flex: 1;
+    /* 버튼들이 컨테이너 안에서 동일한 비율로 줄어들게 함 */
+    max-width: 250px;
+    /* 너무 커지는 것 방지 */
+}
+
+.img-btn:hover {
+    transform: scale(1.05);
+}
+
+.img-btn img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* 둥둥 떠다니는 애니메이션 */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* 반응형 처리 */
+@media (min-width: 768px) {
+    .button-container {
+        display: flex;
+        /* 가로 배치를 명시적으로 유지 */
+        flex-direction: row;
+        width: 80%;
+        /* 화면 너비의 80%를 차지하도록 설정 (유동적) */
+        max-width: 600px;
+        /* 하지만 너무 커지는 것은 방지 */
+        justify-content: center;
+        gap: 5%;
+        /* 고정 px 대신 % 간격을 써서 비율 유지 */
+    }
+
+    .img-btn {
+        width: 45%;
+        /* 버튼 한 개가 컨테이너의 절반 정도를 차지 */
+        max-width: 250px;
+        /* 최대 크기 제한 */
+    }
+
+    .bubble-container {
+        top: 30%;
+        /* 위치 비율 고정 */
+        width: 70%;
+        /* 화면 너비에 따라 말풍선 크기 조절 */
+        max-width: 500px;
+    }
+
+    .card-back img {
+        width: 80%;
+        max-width: 600px;
+    }
 }
