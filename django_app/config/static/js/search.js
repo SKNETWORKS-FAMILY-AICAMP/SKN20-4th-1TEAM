@@ -64,6 +64,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // 검색창 Enter 키 이벤트
+    const searchInput = document.querySelector('.main-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                executeSearch();
+            }
+        });
+    }
+    
+    // 검색 버튼 클릭 이벤트
+    const searchBtn = document.querySelector('.search-icon-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            executeSearch();
+        });
+    }
 });
 
 // ===== 내 정보 자동입력 =====
@@ -155,8 +173,6 @@ function executeSearch() {
             alert('검색 중 오류가 발생했습니다: ' + data.error);
         } else {
             // 검색 결과 표시
-            alert(`검색 완료!\n총 ${data.count}개의 정책을 찾았습니다.`);
-            // TODO: 여기에 결과를 표시하는 로직 추가
             displaySearchResults(data.results);
         }
     })
@@ -166,10 +182,246 @@ function executeSearch() {
     });
 }
 
-// 검색 결과 표시 함수 (임시)
+// 전역 변수
+let currentPage = 1;
+const itemsPerPage = 15; // 한 페이지당 15개 (5 x 3)
+let allResults = [];
+
+// 검색 결과 표시 함수
 function displaySearchResults(results) {
-    // TODO: 실제 UI에 결과를 표시하는 로직 구현
-    console.log('검색 결과 표시:', results);
+    allResults = results;
+    currentPage = 1;
+    
+    // 검색 결과 섹션 표시
+    const resultsSection = document.getElementById('search-results-section');
+    resultsSection.classList.add('active');
+    
+    // 결과 개수 업데이트
+    document.getElementById('results-count').textContent = results.length;
+    
+    // 결과 렌더링
+    renderResults();
+    renderPagination();
+}
+
+// 결과 렌더링
+function renderResults() {
+    const resultsGrid = document.getElementById('results-grid');
+    resultsGrid.innerHTML = '';
+    
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const endIdx = startIdx + itemsPerPage;
+    const pageResults = allResults.slice(startIdx, endIdx);
+    
+    pageResults.forEach(policy => {
+        const card = createPolicyCard(policy);
+        resultsGrid.appendChild(card);
+    });
+    
+    // 결과로 스크롤
+    resultsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// 정책 카드 생성
+function createPolicyCard(policy) {
+    const card = document.createElement('div');
+    card.className = 'policy-card';
+    
+    // 마감 상태 계산
+    const status = getPolicyStatus(policy.period, policy.period_type);
+    const statusText = getStatusText(status);
+    const statusClass = getStatusClass(status);
+    
+    // 키워드 분리 (쉼표로 구분)
+    const keywords = policy.keywords ? policy.keywords.split(',').slice(0, 3) : [];
+    
+    card.innerHTML = `
+        <div class="policy-status ${statusClass}">${statusText}</div>
+        <div class="policy-category">${policy.category || '정책'}</div>
+        <h4 class="policy-title">${policy.title}</h4>
+        <p class="policy-description">${policy.description || '정책 설명이 없습니다.'}</p>
+        <div class="policy-period">
+            <strong>신청기간:</strong> ${formatPeriod(policy.period, policy.period_type)}
+        </div>
+        <button class="policy-detail-btn" onclick="viewPolicyDetail('${policy.id}')">
+            자세히보기
+        </button>
+        <div class="policy-keywords">
+            ${keywords.map(kw => `<span class="keyword-tag">${kw.trim()}</span>`).join('')}
+        </div>
+    `;
+    
+    return card;
+}
+
+// 정책 상태 계산
+function getPolicyStatus(period, periodType) {
+    // 신청기간구분이 마감이면
+    if (periodType && periodType.includes('마감')) {
+        return 'closed';
+    }
+    
+    // 신청기간구분이 상시/연중이면
+    if (periodType && (periodType.includes('상시') || periodType.includes('연중'))) {
+        return 'ongoing';
+    }
+    
+    // 신청기간이 없으면 신청기간구분 확인
+    if (!period || period.trim() === '') {
+        if (periodType && periodType.includes('특정기간')) {
+            return 'unknown';
+        }
+        return 'ongoing'; // 신청기간도 없고 특정기간도 아니면 진행중으로 간주
+    }
+    
+    const today = new Date();
+    const todayStr = formatDateToYYYYMMDD(today);
+    
+    // 신청기간에 상시/연중이 포함되어 있으면
+    if (period.includes('상시') || period.includes('연중')) {
+        return 'ongoing';
+    }
+    
+    // 여러 기간이 있을 수 있으므로 모든 종료일 추출
+    const matches = period.match(/~\s*(\d{8})/g);
+    if (matches && matches.length > 0) {
+        // 모든 종료일 추출
+        const endDates = matches.map(m => m.replace(/~\s*/, ''));
+        // 가장 마지막 종료일
+        const latestEndDate = Math.max(...endDates.map(d => parseInt(d)));
+        const endDateStr = latestEndDate.toString();
+        
+        if (endDateStr < todayStr) {
+            return 'closed'; // 마감
+        }
+        
+        // 마감 7일 전
+        const endDateObj = parseYYYYMMDD(endDateStr);
+        const daysUntilEnd = Math.floor((endDateObj - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilEnd <= 7) {
+            return 'deadline-soon'; // 마감임박
+        }
+        
+        return 'ongoing'; // 진행중
+    }
+    
+    return 'unknown';
+}
+
+// 상태 텍스트
+function getStatusText(status) {
+    const statusMap = {
+        'ongoing': '진행중',
+        'deadline-soon': '마감임박',
+        'closed': '마감',
+        'unknown': '확인필요'
+    };
+    return statusMap[status] || '확인필요';
+}
+
+// 상태 클래스
+function getStatusClass(status) {
+    return status;
+}
+
+// 날짜 포맷 (YYYYMMDD -> Date)
+function parseYYYYMMDD(dateStr) {
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    return new Date(year, month - 1, day);
+}
+
+// Date -> YYYYMMDD
+function formatDateToYYYYMMDD(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+}
+
+// 기간 포맷
+function formatPeriod(period, periodType) {
+    // 신청기간이 없으면 신청기간구분 표시
+    if (!period || period.trim() === '') {
+        if (periodType) {
+            return periodType;
+        }
+        return '미정';
+    }
+    
+    // 상시/연중이면 그대로 표시
+    if (period.includes('상시') || period.includes('연중')) {
+        return period;
+    }
+    
+    // YYYYMMDD 형식을 YYYY.MM.DD로 변환
+    // \N 또는 줄바꿈은 " / "로 구분
+    const formatted = period
+        .replace(/\\N/g, ' / ')
+        .replace(/\n/g, ' / ')
+        .replace(/(\d{4})(\d{2})(\d{2})/g, '$1.$2.$3');
+    
+    return formatted;
+}
+
+// 페이지네이션 렌더링
+function renderPagination() {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    
+    const totalPages = Math.ceil(allResults.length / itemsPerPage);
+    
+    if (totalPages <= 1) return;
+    
+    // 이전 버튼
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.textContent = '이전';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => changePage(currentPage - 1);
+    pagination.appendChild(prevBtn);
+    
+    // 페이지 번호 버튼
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, startPage + 4);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = 'pagination-btn';
+        if (i === currentPage) {
+            pageBtn.classList.add('active');
+        }
+        pageBtn.textContent = i;
+        pageBtn.onclick = () => changePage(i);
+        pagination.appendChild(pageBtn);
+    }
+    
+    // 다음 버튼
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.textContent = '다음';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => changePage(currentPage + 1);
+    pagination.appendChild(nextBtn);
+}
+
+// 페이지 변경
+function changePage(page) {
+    const totalPages = Math.ceil(allResults.length / itemsPerPage);
+    if (page < 1 || page > totalPages) return;
+    
+    currentPage = page;
+    renderResults();
+    renderPagination();
+}
+
+// 정책 상세보기
+function viewPolicyDetail(policyId) {
+    // TODO: 상세보기 모달 또는 페이지로 이동
+    alert(`정책 ID: ${policyId}의 상세 정보를 표시합니다.`);
+    // 실제 구현 시: 모달 열기 또는 상세 페이지로 이동
 }
 
 // ===== 필터 초기화 =====

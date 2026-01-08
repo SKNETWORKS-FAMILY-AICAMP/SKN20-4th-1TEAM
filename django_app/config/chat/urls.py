@@ -7,5 +7,5 @@ urlpatterns = [
     path("ask/", ask_question, name="ask"),
     path("main.css", serve_css, name="css"),  # CSS 파일
     path("search.css", serve_search_css, name="search_css"),  # 검색 CSS 파일
-    path("/chat/search-policy/", search_policy, name="search_policy"),  # 정책 검색 페이지
+    path("search-policy/", search_policy, name="search_policy"),  # 정책 검색 페이지
 ]

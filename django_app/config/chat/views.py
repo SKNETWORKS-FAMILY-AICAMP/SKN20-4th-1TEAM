@@ -1,6 +1,7 @@
 import uuid
 import os
 import json
+from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -230,15 +231,68 @@ def search_policy(request):
                 q_spec |= Q(specialization__icontains=spec)
             policies = policies.filter(q_spec)
 
+        # (9) 마감제외 (exclude_closed) - 현재 날짜 기준
+        if exclude_closed:
+            import re
+            today = datetime.now().strftime('%Y%m%d')  # YYYYMMDD 형식 (예: 20260109)
+            
+            # 마감되지 않은 정책 필터링
+            # 1단계: 기본 필터 - 상시/연중이거나 마감이 아닌 것들
+            policies = policies.exclude(
+                period_type__icontains='마감'  # '마감'으로 명시된 것 제외
+            )
+            
+            # 2단계: 신청기간의 종료일 확인
+            filtered_ids = []
+            for policy in policies:
+                # 상시/연중은 항상 포함
+                if policy.period_type and ('상시' in policy.period_type or '연중' in policy.period_type):
+                    filtered_ids.append(policy.policy_id)
+                    continue
+                
+                if policy.application_period and ('상시' in policy.application_period or '연중' in policy.application_period):
+                    filtered_ids.append(policy.policy_id)
+                    continue
+                
+                # 신청기간이 없으면 신청기간구분 확인
+                if not policy.application_period or policy.application_period.strip() == '':
+                    # 신청기간구분이 '특정기간'이 아니거나 없으면 포함
+                    if not policy.period_type or '특정기간' not in policy.period_type:
+                        filtered_ids.append(policy.policy_id)
+                    continue
+                
+                # 신청기간에서 모든 종료일 추출
+                # 형식: "20250801 ~ 20250828" 또는 "20260101 ~ 20261231\N20270101 ~ 20271231"
+                # \N, \n, 줄바꿈 등으로 구분된 여러 기간 처리
+                periods_text = policy.application_period.replace('\\N', '\n').replace('\\n', '\n')
+                
+                # 모든 "~ YYYYMMDD" 패턴 찾기
+                end_dates = re.findall(r'~\s*(\d{8})', periods_text)
+                
+                if end_dates:
+                    # 가장 마지막(최신) 종료일 확인
+                    latest_end_date = max(end_dates)
+                    if latest_end_date >= today:  # 종료일이 오늘 이후이면 포함
+                        filtered_ids.append(policy.policy_id)
+                else:
+                    # 날짜 형식이 아니면 포함 (안전하게)
+                    filtered_ids.append(policy.policy_id)
+            
+            # 필터링된 ID로 쿼리셋 재구성
+            policies = policies.filter(policy_id__in=filtered_ids)
+
         # 4. 결과 반환
         results = []
-        for p in policies[:50]:
+        for p in policies:
             results.append({
-                "id": p.policy_id,
+                "id": str(p.policy_id),
                 "title": p.title,
-                "description": p.description[:100] + "..." if p.description else "",
+                "description": p.description[:150] + "..." if p.description and len(p.description) > 150 else p.description or "",
+                "category": p.category_major or "기타",
                 "region": p.region,
                 "period": p.application_period,
+                "period_type": p.period_type or "",
+                "keywords": p.keywords or "",
                 "url": p.app_url
             })
 
