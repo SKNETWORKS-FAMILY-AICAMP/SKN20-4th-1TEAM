@@ -419,9 +419,142 @@ function changePage(page) {
 
 // 정책 상세보기
 function viewPolicyDetail(policyId) {
-    // TODO: 상세보기 모달 또는 페이지로 이동
-    alert(`정책 ID: ${policyId}의 상세 정보를 표시합니다.`);
-    // 실제 구현 시: 모달 열기 또는 상세 페이지로 이동
+    const modal = document.getElementById('policy-detail-modal');
+    const loading = document.getElementById('policy-loading');
+    const content = document.getElementById('policy-detail-content');
+    
+    // 모달 열기
+    modal.classList.add('active');
+    loading.style.display = 'flex';
+    content.style.display = 'none';
+    
+    // API 호출
+    fetch(`/chat/policy-detail/${policyId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('정책 정보를 불러오는데 실패했습니다: ' + data.error);
+                closePolicyDetailModal();
+                return;
+            }
+            
+            // 정책 정보 표시
+            displayPolicyDetail(data);
+            loading.style.display = 'none';
+            content.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('정책 상세 조회 오류:', error);
+            alert('정책 정보를 불러오는데 실패했습니다.');
+            closePolicyDetailModal();
+        });
+}
+
+// 정책 상세 정보 표시
+function displayPolicyDetail(policy) {
+    // 헤더 정보
+    document.getElementById('detail-category').textContent = policy.category_major || '정책';
+    
+    const statusBadge = document.getElementById('detail-status');
+    const status = getPolicyStatus(policy.application_period, policy.period_type);
+    statusBadge.textContent = getStatusText(status);
+    statusBadge.className = 'policy-status-badge ' + status;
+    
+    document.getElementById('detail-title').textContent = policy.title || '정책명 없음';
+    
+    // 키워드
+    const keywordsContainer = document.getElementById('detail-keywords');
+    if (policy.keywords) {
+        const keywords = policy.keywords.split(',').slice(0, 5);
+        keywordsContainer.innerHTML = keywords
+            .map(kw => `<span class="keyword-tag">${kw.trim()}</span>`)
+            .join('');
+    } else {
+        keywordsContainer.innerHTML = '';
+    }
+    
+    document.getElementById('detail-middle-category').textContent = policy.category_middle || '';
+    
+    // 정책 설명
+    document.getElementById('detail-description').textContent = policy.description || '정책 설명이 없습니다.';
+    
+    // 지원 정보
+    document.getElementById('detail-support-content').textContent = policy.support_content || '-';
+    
+    // 지원 연령
+    let ageRange = '-';
+    if (policy.age_min || policy.age_max) {
+        if (policy.age_min && policy.age_max) {
+            ageRange = `${policy.age_min}세 ~ ${policy.age_max}세`;
+        } else if (policy.age_min) {
+            ageRange = `${policy.age_min}세 이상`;
+        } else if (policy.age_max) {
+            ageRange = `${policy.age_max}세 이하`;
+        }
+    }
+    document.getElementById('detail-age-range').textContent = ageRange;
+    
+    // 지원 금액
+    let amountRange = '-';
+    if (policy.min_support_amount || policy.max_support_amount) {
+        const min = policy.min_support_amount || '-';
+        const max = policy.max_support_amount || '-';
+        amountRange = `${min} ~ ${max}`;
+    }
+    document.getElementById('detail-amount-range').textContent = amountRange;
+    
+    document.getElementById('detail-period').textContent = formatPeriod(policy.application_period, policy.period_type);
+    document.getElementById('detail-application-method').textContent = policy.application_method || '-';
+    document.getElementById('detail-documents').textContent = policy.required_documents || '-';
+    document.getElementById('detail-selection').textContent = policy.selection_method || '-';
+    
+    // 참고 URL
+    const url1Container = document.getElementById('detail-url1-container');
+    const url2Container = document.getElementById('detail-url2-container');
+    
+    if (policy.ref_url1 && policy.ref_url1.trim()) {
+        url1Container.style.display = 'flex';
+        const url1Link = document.getElementById('detail-url1');
+        url1Link.href = policy.ref_url1;
+        url1Link.textContent = policy.ref_url1;
+    } else {
+        url1Container.style.display = 'none';
+    }
+    
+    if (policy.ref_url2 && policy.ref_url2.trim()) {
+        url2Container.style.display = 'flex';
+        const url2Link = document.getElementById('detail-url2');
+        url2Link.href = policy.ref_url2;
+        url2Link.textContent = policy.ref_url2;
+    } else {
+        url2Container.style.display = 'none';
+    }
+    
+    // 자격 요건
+    document.getElementById('detail-marital-status').textContent = policy.marital_status || '-';
+    document.getElementById('detail-income').textContent = policy.income_condition || '-';
+    document.getElementById('detail-major').textContent = policy.major_requirement || '-';
+    document.getElementById('detail-employment').textContent = policy.employment_status || '-';
+    document.getElementById('detail-education').textContent = policy.education_requirement || '-';
+    document.getElementById('detail-specialization').textContent = policy.specialization || '-';
+    document.getElementById('detail-region').textContent = policy.region || '-';
+    
+    // 운영 기관
+    document.getElementById('detail-hosting-org').textContent = policy.hosting_org || '-';
+    document.getElementById('detail-registering-org').textContent = policy.registering_org || '-';
+    document.getElementById('detail-parent-org').textContent = policy.parent_org || '-';
+    document.getElementById('detail-parent-registering-org').textContent = policy.parent_registering_org || '-';
+}
+
+// 정책 상세보기 모달 닫기
+function closePolicyDetailModal(event) {
+    const modal = document.getElementById('policy-detail-modal');
+    
+    if (event && event.target !== modal) {
+        return;
+    }
+    
+    modal.classList.remove('active');
 }
 
 // ===== 필터 초기화 =====
