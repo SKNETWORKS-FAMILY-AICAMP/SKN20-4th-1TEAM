@@ -1,6 +1,6 @@
 # 청년 정책 AI 챗봇 서비스 (Youth Policy AI Chatbot)
 
-AI 기반의 청년 정책 추천 및 검색 시스템으로, 사용자의 질문에 대해 실시간으로 맞춤형 청년 정책을 추천하고 검색할 수 있는 종합 솔루션
+AI 기반의 청년 정책 추천 및 검색 시스템으로, 사용자의 질문에 대해 실시간으로 맞춤형 청년 정책을 추천하고 검색할 수 있는 챗봇
 
 ---
 
@@ -122,55 +122,6 @@ SKN20-4th-1TEAM/
 
 ---
 
-## 🚀 설치 및 실행
-
-### 사전 요구사항
-- Python 3.8 이상
-- pip (파이썬 패키지 관리자)
-
-### 1단계: 환경 설정
-
-```bash
-# 프로젝트 디렉토리로 이동
-cd SKN20-4th-1TEAM/django_app/config
-
-# 가상환경 생성 (권장)
-python -m venv venv
-
-# 가상환경 활성화
-# macOS / Linux
-source venv/bin/activate
-
-# Windows
-venv\Scripts\activate
-```
-
-### 2단계: 의존성 설치
-
-```bash
-pip install django==5.0
-```
-
-### 3단계: 데이터베이스 초기화
-
-```bash
-# 마이그레이션 실행
-python manage.py migrate
-
-# 정책 데이터 로드
-python manage.py load_policies
-```
-
-### 4단계: 개발 서버 실행
-
-```bash
-python manage.py runserver
-```
-
-**접속 주소**: `http://127.0.0.1:8000`
-
----
-
 ## 📡 API 명세
 
 ### 1. 메인 페이지 조회
@@ -193,37 +144,6 @@ GET /chat/
 ```
 - **설명**: AI 챗봇 채팅 페이지 렌더링
 - **응답**: HTML 페이지
-
-### 4. 정책 검색
-```
-GET /api/search/?keyword=<검색어>&category=<분류>&age_min=<최소연령>&age_max=<최대연령>
-```
-- **설명**: 정책 데이터 검색
-- **파라미터**:
-  - `keyword`: 검색 키워드 (선택)
-  - `category`: 정책 분류 (선택)
-  - `age_min`: 최소 연령 (선택)
-  - `age_max`: 최대 연령 (선택)
-- **응답**: JSON (정책 목록)
-
-### 5. 채팅 메시지 전송
-```
-POST /api/chat/
-Content-Type: application/json
-
-{
-  "user_uuid": "사용자UUID",
-  "question": "정책 관련 질문"
-}
-```
-- **설명**: AI 챗봇에 질문 전송
-- **응답**: JSON (AI 응답)
-```json
-{
-  "answer": "AI 응답 내용",
-  "related_policies": [...]
-}
-```
 
 ---
 
@@ -273,25 +193,6 @@ class Policy(models.Model):
     start_date = models.CharField(max_length=100)
     end_date = models.CharField(max_length=100)
 ```
-
----
-
-## 💡 개발 가이드
-
-### 새로운 뷰 추가
-`django_app/config/chat/views.py`에 새로운 함수를 추가하고, `django_app/config/chat/urls.py`에 URL 패턴을 등록하세요.
-
-### 데이터 모델 변경
-1. `django_app/config/chat/models.py`에서 모델 수정
-2. 마이그레이션 생성: `python manage.py makemigrations`
-3. 마이그레이션 적용: `python manage.py migrate`
-
-### 정책 데이터 업데이트
-`data/youth_policies_filtered_kr_revised.json` 파일을 수정 후:
-```bash
-python manage.py load_policies
-```
-
 ---
 
 ## 📊 데이터 소스
@@ -299,36 +200,5 @@ python manage.py load_policies
 - **정책 데이터**: 대한민국 정부 공식 청년 정책 데이터
 - **데이터 포맷**: JSON
 - **포함 정보**: 정책명, 지원 내용, 신청 기간, 연령 제한, 지원금액 등
-
----
-
-## 🔒 보안 정보
-
-### ⚠️ 현재 개발 환경 설정
-- `DEBUG = True` (개발용)
-- 기본 SECRET_KEY 사용 중
-
-### 프로덕션 배포 시 필수 조사항
-1. `DEBUG = False` 설정
-2. 새로운 SECRET_KEY 생성
-3. `ALLOWED_HOSTS` 설정
-4. HTTPS 강제
-5. CSRF 보호 활성화
-6. 데이터베이스를 PostgreSQL 등으로 변경
-
----
-
-## 📝 라이선스
-
-본 프로젝트는 SKN20 4차 AI 캠프의 교육 목적으로 작성되었습니다.
-
----
-
-### 팀 역할 분담
-- **Architecture & Strategy**: 프로젝트 전체 아키텍처 설계 및 기술 방향 결정
-- **Backend Development**: Django 백엔드 개발 및 API 구현
-- **Frontend Development**: HTML/CSS/JavaScript 프론트엔드 개발
-- **RAG Integration**: AI 기반 RAG 모듈 통합 (진행 중)
-- **Data Management**: 정책 데이터 관리 및 데이터베이스 최적화
 
 ---
