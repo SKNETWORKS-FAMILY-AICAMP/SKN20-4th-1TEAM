@@ -1,6 +1,4 @@
-"# 청년 정책 AI 챗봇 서비스 (Youth Policy AI Chatbot)
-
-> **SKN20 4차 AI 캠프 1팀 최종 프로젝트**
+# 청년 정책 AI 챗봇 서비스 (Youth Policy AI Chatbot)
 
 AI 기반의 청년 정책 추천 및 검색 시스템으로, 사용자의 질문에 대해 실시간으로 맞춤형 청년 정책을 추천하고 검색할 수 있는 종합 솔루션
 
