@@ -1,1107 +1,219 @@
-/* =============================================
-   청년이음 챗봇 스타일시트 (샘플 1 스타일)
-   - 블루-민트 그라데이션 테마
-   - 사이드바 레이아웃
-   - 반응형 디자인 (모바일/태블릿/데스크탑)
-   ============================================= */
+/* Main Landing Page Styles - Directional Rotation */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-/* =============================================
-   1. CSS 변수 (테마 설정)
-   ============================================= */
-:root {
-    /* 색상 - 하늘색-민트 그라데이션 테마 */
-    --color-primary: #5CBFB3;
-    --color-primary-light: #8CD4CB;
-    --color-primary-dark: #4AA89D;
-    --color-secondary: #B8E0D2;
-    --color-accent: #95D5B2;
-
-    --color-background-start: #E0F4F8;
-    --color-background-mid: #D0EEE8;
-    --color-background-end: #C8E8DC;
-    --color-sidebar-bg: rgba(255, 255, 255, 0.92);
-    --color-white: #ffffff;
-    --color-text: #2d3748;
-    --color-text-light: #4a5568;
-    --color-text-muted: #718096;
-    --color-border: #c5dcd8;
-    --color-shadow: rgba(0, 0, 0, 0.08);
-
-    /* 폰트 크기 - clamp(최소, 선호, 최대) 유동적 타이포그래피 */
-    /* 기본값: JS의 Level 1 (0.9배)과 동기화 */
-    --font-size-base: clamp(0.8rem, 0.75rem + 0.45vw, 1rem);
-    --font-size-sm: clamp(0.675rem, 0.65rem + 0.35vw, 0.9rem);
-    --font-size-lg: clamp(0.9rem, 0.85rem + 0.55vw, 1.15rem);
-    --font-size-xs: clamp(0.6rem, 0.55rem + 0.25vw, 0.8rem);
-
-    /* 간격 */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-
-    /* 둥근 모서리 */
-    --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-full: 50%;
-
-    /* 그림자 */
-    --shadow-sm: 0 2px 8px var(--color-shadow);
-    --shadow-md: 0 4px 16px var(--color-shadow);
-    --shadow-lg: 0 8px 32px var(--color-shadow);
-
-    /* 레이아웃 */
-    --sidebar-width: 260px;
-    --input-area-height: 80px;
-    --main-header-height: 56px;
-}
-
-/* =============================================
-   2. 리셋 및 기본 스타일
-   ============================================= */
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html,
-body {
+body,
+html {
+    width: 100%;
     height: 100%;
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: var(--font-size-base);
-    color: var(--color-text);
-    /* del-SKN20-4th-1TEAM 채팅 페이지 배경 스타일 */
-    background: linear-gradient(135deg, #c8e6e0 0%, #e0f0ed 25%, #ffffff 50%, #e8f4fc 75%, #d4eaf8 100%);
-    background-attachment: fixed;
-}
-
-body {
-    display: flex;
-    overflow: hidden;
-}
-
-/* =============================================
-   3. 사이드바
-   ============================================= */
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: var(--sidebar-width);
-    background: var(--color-sidebar-bg);
-    backdrop-filter: blur(10px);
-    border-right: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    z-index: 200;
-    transition: width 0.3s ease;
-    overflow: hidden;
-}
-
-/* 데스크탑에서 사이드바 축소 상태 (미니 레일) */
-.sidebar.collapsed {
-    width: 68px;
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: var(--spacing-sm);
-    height: 56px;
-}
-
-.sidebar-toggle {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    background: transparent;
-    color: var(--color-text);
-    cursor: pointer;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-}
-
-.sidebar-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.logo-text {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    background-color: var(--color-primary-light);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
-}
-
-.sidebar-close-btn {
-    display: none;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: var(--color-text-light);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: background-color 0.2s;
-}
-
-.sidebar-close-btn:hover {
-    background-color: var(--color-border);
-}
-
-.sidebar-nav {
-    padding: var(--spacing-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: none;
-    background: transparent;
-    color: var(--color-text);
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: background-color 0.2s, color 0.2s, padding 0.3s, justify-content 0.3s;
-    text-align: left;
-    width: 100%;
-    white-space: nowrap;
-}
-
-.nav-item:hover {
-    background-color: var(--color-secondary);
-    color: var(--color-primary-dark);
-}
-
-.nav-item svg {
-    flex-shrink: 0;
-}
-
-.nav-item span {
-    transition: opacity 0.2s, width 0.2s;
-}
-
-.nav-item .icon-text {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-/* 사이드바 축소 시 nav-item 스타일 */
-.sidebar.collapsed .nav-item {
-    justify-content: center;
-    padding: var(--spacing-sm);
-}
-
-.sidebar.collapsed .nav-item span:not(.icon-text) {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
-}
-
-.sidebar-section {
-    flex: 1;
-    padding: var(--spacing-md);
-    overflow-y: auto;
-}
-
-.section-title {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: var(--spacing-sm);
-    padding-left: var(--spacing-sm);
-}
-
-.chat-history-list {
-    list-style: none;
-}
-
-.history-item {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-light);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background-color 0.2s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.history-item:hover {
-    background-color: var(--color-secondary);
-}
-
-.history-item.active {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary-dark);
-    font-weight: 500;
-}
-
-.sidebar-footer {
-    padding: var(--spacing-md);
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-/* 사이드바 축소 시 섹션 타이틀 및 채팅 기록 숨김 */
-.sidebar.collapsed .section-title,
-.sidebar.collapsed .chat-history-list {
-    opacity: 0;
-    display: none;
-}
-
-/* 사이드바 오버레이 (모바일용) */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    z-index: 150;
-}
-
-/* =============================================
-   4. 메인 콘텐츠 영역
-   ============================================= */
-.main-content {
-    flex: 1;
-    margin-left: var(--sidebar-width);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    transition: margin-left 0.3s ease;
-}
-
-/* 사이드바 접힌 상태일 때 메인 컨텐츠 확장 */
-body.sidebar-collapsed .main-content {
-    margin-left: 68px;
-}
-
-.main-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    height: var(--main-header-height);
-}
-
-.main-header .menu-toggle-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: transparent;
-    color: var(--color-text);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: background-color 0.2s;
-}
-
-.main-header .menu-toggle-btn:hover {
-    background-color: var(--color-border);
-}
-
-/* 헤더의 햄버거 버튼 - 기본적으로 숨김, 사이드바 접히면 표시 */
-.header-toggle-btn {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: transparent;
-    color: var(--color-text);
-    cursor: pointer;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-}
-
-.header-toggle-btn:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-
-.main-header .logo {
-    display: flex;
-    align-items: center;
-}
-
-.main-header .logo img {
-    height: 36px;
-    width: auto;
-    border-radius: var(--radius-sm);
-}
-
-.main-header .logo-text {
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    background-color: var(--color-primary-light);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-}
-
-/* =============================================
-   5. 채팅 래퍼
-   ============================================= */
-.chat-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    /* max-width 제거하여 스크롤바를 화면 끝으로 이동 */
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-family: 'Pretendard', sans-serif;
+}
+
+/* 고정 배경 레이어 (회전하지 않음) */
+.background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/static/assets/images/back.png');
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 3D 공간 (원근감 설정) */
+.scene {
+    width: 100vw;
+    height: 100vh;
+    perspective: 1500px;
     position: relative;
-    /* 자식 요소(placeholder)의 기준점 설정 */
+    z-index: 10;
 }
 
-/* =============================================
-   6. 채팅 컨테이너
-   ============================================= */
-.chat-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: var(--spacing-lg);
-    /* 기존 wrapper의 패딩을 여기로 이동 */
-    padding-bottom: 0;
-}
-
-/* 스크롤바 스타일 */
-.chat-container::-webkit-scrollbar,
-.modal-body::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-container::-webkit-scrollbar-track,
-.modal-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-container::-webkit-scrollbar-thumb,
-.modal-body::-webkit-scrollbar-thumb {
-    background-color: var(--color-border);
-    border-radius: 3px;
-}
-
-.chat-container::-webkit-scrollbar-thumb:hover,
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-primary-light);
-}
-
-/* =============================================
-   7. 메시지 스타일
-   ============================================= */
-.message {
-    display: flex;
-    margin-bottom: var(--spacing-md);
-    animation: fadeIn 0.3s ease;
-
-    /* 중앙 정렬 */
-    max-width: 800px;
+/* 카드 (회전 대상: 화면 전체 크기 유지) */
+.card {
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.8s ease-in-out;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* 카드 앞면/뒷면 공통 */
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
-.bot-message {
-    justify-content: flex-start;
-    align-items: flex-start;
-}
-
-.bot-message .message-bubble {
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border-radius: var(--radius-md);
-    border-top-left-radius: var(--spacing-xs);
-    margin-left: var(--spacing-sm);
-}
-
-.user-message {
+/* 앞면: 버블 + 버튼 (배경 투명) */
+.card-front {
+    display: flex;
+    flex-direction: column;
     justify-content: flex-end;
-}
-
-.user-message .message-bubble {
-    background-color: var(--color-white);
-    color: var(--color-text);
-    border-radius: var(--radius-md);
-    border-bottom-right-radius: var(--spacing-xs);
-    box-shadow: var(--shadow-sm);
-}
-
-.message-bubble {
-    max-width: 70%;
-    padding: var(--spacing-md);
-    line-height: 1.6;
-}
-
-.message-bubble p {
-    margin-bottom: var(--spacing-xs);
-}
-
-.message-bubble p:last-child {
-    margin-bottom: 0;
-}
-
-/* =============================================
-   8. 마크다운 렌더링 스타일
-   ============================================= */
-.markdown-content {
-    line-height: 1.7;
-}
-
-.markdown-content p {
-    margin-bottom: var(--spacing-sm);
-}
-
-.markdown-content p:last-child {
-    margin-bottom: 0;
-}
-
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4 {
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
-    font-weight: 600;
-}
-
-.markdown-content h1 {
-    font-size: 1.2em;
-}
-
-.markdown-content h2 {
-    font-size: 1.1em;
-}
-
-.markdown-content h3,
-.markdown-content h4 {
-    font-size: 1em;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-    padding-left: var(--spacing-lg);
-    margin-bottom: var(--spacing-sm);
-}
-
-.markdown-content li {
-    margin-bottom: var(--spacing-xs);
-}
-
-.markdown-content strong {
-    font-weight: 700;
-}
-
-.markdown-content hr {
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    margin: var(--spacing-md) 0;
-}
-
-.markdown-content code {
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
-.markdown-content pre {
-    background-color: rgba(0, 0, 0, 0.15);
-    padding: var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    overflow-x: auto;
-    margin: var(--spacing-sm) 0;
-}
-
-.markdown-content pre code {
-    background: none;
-    padding: 0;
-}
-
-/* =============================================
-   9. 아바타
-   ============================================= */
-.avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    flex-shrink: 0;
-    background-color: var(--color-white);
-    display: flex;
-    justify-content: center;
     align-items: center;
-    border: 2px solid var(--color-primary);
-    box-shadow: var(--shadow-sm);
+    padding-bottom: 5vh;
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.avatar-placeholder {
-    background-color: var(--color-primary);
-}
-
-.avatar-placeholder::after {
-    content: '🐱';
-    font-size: 24px;
-}
-
-/* =============================================
-   10. 타이핑 인디케이터
-   ============================================= */
-.typing-indicator {
+/* 뒷면: 전환 이미지 (버블+버튼 위치에 맞춤) */
+.card-back {
+    transform: rotateY(180deg);
     display: flex;
-    gap: 4px;
-    padding: var(--spacing-xs) 0;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background-color: var(--color-white);
-    border-radius: var(--radius-full);
-    animation: bounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes bounce {
-
-    0%,
-    80%,
-    100% {
-        transform: scale(0.6);
-        opacity: 0.5;
-    }
-
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* =============================================
-   11. 추천 질문 영역
-   ============================================= */
-.suggestion-area {
-    padding: var(--spacing-xs) 0;
-    /* 중앙 정렬 */
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    padding-left: var(--spacing-lg);
-    padding-right: var(--spacing-lg);
-}
-
-.suggestion-title {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--color-text-muted);
-    margin-bottom: var(--spacing-xs);
-    text-align: center;
-}
-
-.suggestion-container {
-    display: flex;
-    gap: var(--spacing-sm);
-}
-
-.suggestion-card {
-    flex: 1;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    color: var(--color-text);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: keep-all;
-}
-
-.suggestion-card:hover {
-    background-color: var(--color-secondary);
-    border-color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
-}
-
-/* =============================================
-   12. 입력 영역
-   ============================================= */
-.input-area {
-    padding: var(--spacing-sm) 0;
-    /* 중앙 정렬 */
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    padding-left: var(--spacing-lg);
-    padding-right: var(--spacing-lg);
-}
-
-.input-wrapper {
-    display: flex;
-    gap: var(--spacing-sm);
-    background: var(--color-white);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-sm);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--color-border);
-}
-
-.message-input {
-    flex: 1;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: none;
-    font-size: var(--font-size-base);
-    font-family: inherit;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 5vh;
     background: transparent;
-    outline: none;
-    resize: none;
-    min-height: 24px;
-    max-height: 72px;
-    /* 약 3줄 */
-    overflow-y: auto;
-    line-height: 1.5;
+    /* 배경 투명 */
 }
 
-.message-input::placeholder {
-    color: var(--color-text-muted);
-}
-
-.send-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 44px;
-    height: 44px;
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-}
-
-.send-btn:hover {
-    background-color: var(--color-primary-dark);
-}
-
-.send-btn:active {
-    transform: scale(0.95);
-}
-
-.send-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* Sending State (Stop Icon) */
-.send-btn.sending .icon-send {
-    display: none;
-}
-
-.send-btn.sending .icon-stop {
-    display: block !important;
-}
-
-/* =============================================
-   13. 모달 (도움말)
-   ============================================= */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background-color: var(--color-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    transform: translateY(-20px);
-    transition: transform 0.3s;
-    overflow: visible;
-    /* X버튼 외부 표시를 위해 visible */
-}
-
-.modal-overlay.active .modal-content {
-    transform: translateY(0);
-}
-
-.modal-close {
-    position: absolute;
-    top: -40px;
-    /* 외부로 이동 */
-    right: -40px;
-    /* 외부로 이동 */
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: transparent;
-    /* 배경 투명 (글자만 보이게 하거나, 원하면 배경색 추가) */
-    color: var(--color-white);
-    /* 어두운 오버레이 위이므로 흰색 */
-    font-size: 32px;
-    line-height: 1;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.modal-close:hover {
-    background-color: transparent;
-    transform: scale(1.1);
-}
-
-.modal-body {
-    padding: var(--spacing-xl);
-    /* padding-top: calc(var(--spacing-xl) + 20px); X버튼 밖으로 나갔으므로 상단 패딩 축소 가능 */
-    overflow-y: auto;
-    line-height: 1.6;
-
-    /* 스크롤바가 라운드와 겹치지 않게 하기 위해 마진을 주고, 높이를 제한 */
-    margin: var(--spacing-sm) 0;
-    max-height: calc(80vh - 40px);
-    /* modal-content 높이 안에서 계산 */
-}
-
-.modal-body h1 {
-    font-size: 1.2em;
-    color: var(--color-primary-dark);
-    margin-bottom: var(--spacing-md);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.modal-body h2 {
-    font-size: 1.2em;
-    color: var(--color-text);
-    margin-top: var(--spacing-lg);
-    margin-bottom: var(--spacing-sm);
-}
-
-.modal-body h3 {
-    font-size: 1em;
-    color: var(--color-primary-dark);
-    margin-top: var(--spacing-md);
-    margin-bottom: var(--spacing-xs);
-}
-
-.modal-body p {
-    margin-bottom: var(--spacing-sm);
-}
-
-.modal-body ul,
-.modal-body ol {
-    padding-left: var(--spacing-lg);
-    margin-bottom: var(--spacing-sm);
-}
-
-.modal-body li {
-    margin-bottom: var(--spacing-xs);
-}
-
-.modal-body hr {
-    border: none;
-    border-top: 1px solid var(--color-border);
-    margin: var(--spacing-lg) 0;
-}
-
-/* =============================================
-   14. 반응형 디자인 (태블릿)
-   ============================================= */
-@media (max-width: 1024px) {
-    :root {
-        --sidebar-width: 260px;
-    }
-}
-
-/* =============================================
-   15. 반응형 디자인 (모바일)
-   ============================================= */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-    }
-
-    .sidebar-close-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .sidebar-overlay.active {
-        display: block;
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .header-toggle-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 40px;
-        height: 40px;
-        border: none;
-        background: transparent;
-        color: var(--color-text);
-        cursor: pointer;
-        border-radius: var(--radius-sm);
-        transition: background-color 0.2s;
-    }
-
-    .header-toggle-btn:hover {
-        background-color: var(--color-border);
-    }
-
-    .chat-wrapper {
-        padding: var(--spacing-md);
-        padding-bottom: 0;
-    }
-
-    .message-bubble {
-        max-width: 85%;
-    }
-
-    .avatar {
-        width: 38px;
-        height: 38px;
-    }
-
-    .suggestion-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .suggestion-card {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    :root {
-        --font-size-base: 14px;
-        --spacing-md: 12px;
-        --mobile-top-bar-height: 52px;
-    }
-
-    .avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    .avatar-placeholder::after {
-        font-size: 18px;
-    }
-
-    .message-bubble {
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-
-    .modal-content {
-        width: 95%;
-        max-height: 90vh;
-    }
-
-    .modal-body {
-        padding: var(--spacing-md);
-        padding-top: calc(var(--spacing-md) + 40px);
-    }
-
-    .modal-body h1 {
-        font-size: 1.2em;
-    }
-
-    /* 모바일에서는 X버튼 안으로 복귀 */
-    .modal-close {
-        top: 10px;
-        right: 10px;
-        color: var(--color-text);
-        background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-content {
-        overflow: hidden;
-        /* 모바일은 둥근 모서리 유지 */
-    }
-}
-
-/* =============================================
-   16. Cover Page (추가됨)
-   ============================================= */
-.cover-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #e0f4f8 0%, #d0eee8 100%);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-    transition: opacity 0.5s ease-out, visibility 0.5s;
-}
-
-.cover-page.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.cover-content h1 {
-    font-size: 3rem;
-    color: var(--color-primary-dark);
-    margin-bottom: var(--spacing-md);
-}
-
-.cover-content p {
-    font-size: 1.5rem;
-    color: var(--color-text-muted);
-    margin-bottom: var(--spacing-xl);
-}
-
-.start-btn {
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: white;
-    background-color: var(--color-primary);
-    border: none;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.start-btn:hover {
-    background-color: var(--color-primary-dark);
-    transform: translateY(-2px);
-}
-
-/* =============================================
-   17. Chat Placeholder (nyang.png)
-   ============================================= */
-.chat-placeholder {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    pointer-events: none;
-    /* 클릭 통과 (필요 시) */
-    text-align: center;
-}
-
-.chat-placeholder.hidden {
-    display: none !important;
-}
-
-.placeholder-image {
-    width: 200px;
+/* 전환 이미지: 버블+버튼 영역 크기로 제한 */
+.card-back img {
+    width: 80%;
+    max-width: 400px;
     height: auto;
-    margin-bottom: var(--spacing-md);
-    opacity: 0.8;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    margin-bottom: 50px;
+    /* 버튼 영역과 비슷한 하단 여백 */
 }
 
-.chat-placeholder p {
-    font-size: 1.2rem;
-    color: var(--color-text-muted);
-    font-weight: 600;
+/* === 회전 클래스 === */
+/* 왼쪽으로 회전 (버튼1) */
+.rotate-left {
+    transform: rotateY(-180deg);
+}
+
+/* 오른쪽으로 회전 (버튼2) */
+.rotate-right {
+    transform: rotateY(180deg);
+}
+
+/* ========================================== */
+/* 버블 + 버튼 스타일 */
+/* ========================================== */
+
+/* 말풍선 영역 */
+.bubble-container {
+    position: absolute;
+    top: 15%;
+    width: 80%;
+    max-width: 400px;
+    animation: float 3s ease-in-out infinite;
+    z-index: 10;
+    text-align: center;
+}
+
+.bubble-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* 버튼 컨테이너 */
+.button-container {
+    display: flex;
+    flex-direction: row;
+    /* column에서 row로 변경: 항상 가로 배치 */
+    gap: 10px;
+    /* 화면이 작을 때는 간격을 좁게 조절 */
+    width: 90%;
+    /* 화면 너비에 맞춰 유동적으로 변하게 % 사용 */
+    max-width: 600px;
+    justify-content: center;
+    z-index: 10;
+    margin-bottom: 50px;
+}
+
+/* 이미지 버튼 스타일 */
+.img-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    width: 100%;
+    display: block;
+    flex: 1;
+    /* 버튼들이 컨테이너 안에서 동일한 비율로 줄어들게 함 */
+    max-width: 250px;
+    /* 너무 커지는 것 방지 */
+}
+
+.img-btn:hover {
+    transform: scale(1.05);
+}
+
+.img-btn img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* 둥둥 떠다니는 애니메이션 */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* 반응형 처리 */
+@media (min-width: 768px) {
+    .button-container {
+        display: flex;
+        /* 가로 배치를 명시적으로 유지 */
+        flex-direction: row;
+        width: 80%;
+        /* 화면 너비의 80%를 차지하도록 설정 (유동적) */
+        max-width: 600px;
+        /* 하지만 너무 커지는 것은 방지 */
+        justify-content: center;
+        gap: 5%;
+        /* 고정 px 대신 % 간격을 써서 비율 유지 */
+    }
+
+    .img-btn {
+        width: 45%;
+        /* 버튼 한 개가 컨테이너의 절반 정도를 차지 */
+        max-width: 250px;
+        /* 최대 크기 제한 */
+    }
+
+    .bubble-container {
+        top: 30%;
+        /* 위치 비율 고정 */
+        width: 70%;
+        /* 화면 너비에 따라 말풍선 크기 조절 */
+        max-width: 500px;
+    }
+
+    .card-back img {
+        width: 80%;
+        max-width: 600px;
+    }
 }

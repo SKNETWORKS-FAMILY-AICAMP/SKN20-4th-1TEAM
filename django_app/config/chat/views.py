@@ -1,6 +1,7 @@
 import uuid
 import os
 import json
+import sys
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
@@ -10,13 +11,116 @@ from django.conf import settings
 from django.db.models import Q
 from .models import SessionUser, Question, Answer, Policy
 
+# RAG 모듈 임포트
+sys.path.append(os.path.join(settings.BASE_DIR.parent.parent, 'rag'))
+from advanced_rag4_3 import (
+    AdvancedRAGPipeline,
+    RegionNormalizer,
+    RegionFilter,
+    QueryRouter,
+    MultiQueryGenerator,
+    EnsembleRetriever,
+    ReciprocalRankFusion,
+    ConversationMemory
+)
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from dotenv import load_dotenv
+
+# 프로젝트 루트의 .env 파일 로드
+project_root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+env_path = os.path.join(project_root, '.env')
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+else:
+    # RAG 폴더의 .env 확인
+    rag_env_path = os.path.join(project_root, 'rag', '.env')
+    if os.path.exists(rag_env_path):
+        load_dotenv(rag_env_path)
+
+# 전역 RAG 파이프라인 인스턴스
+_rag_pipeline = None
+
+def initialize_rag_pipeline():
+    """RAG 파이프라인 초기화 (첫 실행 시 한 번만)"""
+    global _rag_pipeline
+    
+    if _rag_pipeline is not None:
+        return _rag_pipeline
+    
+    try:
+        # 프로젝트 루트 경로
+        project_root = settings.BASE_DIR.parent.parent
+        vectordb_path = os.path.join(project_root, 'data', 'vectordb2')
+        regions_code_path = os.path.join(project_root, 'data', 'regions_code.json')
+        
+        # OpenAI API 키 확인
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
+        
+        # 파일 존재 확인
+        if not os.path.exists(vectordb_path):
+            raise FileNotFoundError(f"VectorDB를 찾을 수 없습니다: {vectordb_path}")
+        
+        if not os.path.exists(regions_code_path):
+            raise FileNotFoundError(f"regions_code.json을 찾을 수 없습니다: {regions_code_path}")
+        
+        # LLM 및 임베딩 설정
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=api_key)
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=api_key)
+        
+        # VectorDB 로드
+        vectorstore = Chroma(
+            persist_directory=vectordb_path,
+            embedding_function=embeddings,
+            collection_name="youth_policies"
+        )
+        
+        # regions_code.json 로드
+        with open(regions_code_path, 'r', encoding='utf-8') as f:
+            regions_data = json.load(f)
+        
+        # BM25용 전체 문서 추출
+        all_docs_data = vectorstore.get()
+        documents = [
+            Document(page_content=text, metadata=meta) 
+            for text, meta in zip(all_docs_data['documents'], all_docs_data['metadatas'])
+            if text
+        ]
+        
+        # 파이프라인 생성
+        _rag_pipeline = AdvancedRAGPipeline(
+            vectorstore=vectorstore,
+            regions_data=regions_data,
+            llm=llm,
+            documents=documents
+        )
+        
+        return _rag_pipeline
+        
+    except Exception as e:
+        import traceback
+        print(f"RAG 파이프라인 초기화 실패: {e}")
+        print(f"상세 에러:\n{traceback.format_exc()}")
+        return None
+
 def run_rag(prompt):
     """
-    RAG 파이프라인 호출 (임시 더미 함수)
-    실제 RAG 모듈로 교체 필요
+    RAG 파이프라인 호출
     """
-    # TODO: 실제 RAG 모듈 연결
-    return f"[RAG 응답] {prompt}에 대한 답변입니다."
+    try:
+        pipeline = initialize_rag_pipeline()
+        if pipeline is None:
+            return "죄송합니다. 시스템 초기화에 실패했습니다. 잠시 후 다시 시도해주세요."
+        
+        result = pipeline.query(prompt)
+        return result['answer']
+        
+    except Exception as e:
+        print(f"RAG 실행 에러: {e}")
+        return "죄송합니다. 답변 생성 중 오류가 발생했습니다. 다시 시도해주세요."
 
 def main_page(request):
     """
@@ -30,7 +134,12 @@ def search_page(request):
     """
     return render(request, 'search.html')
 
-def serve_css(request):
+def chat_page(request):
+    """
+    채팅 페이지 렌더링
+    """
+    return render(request, 'chat.html')
+def serve_main_css(request):
     """
     templates 폴더의 CSS 파일 서빙
     """
@@ -44,6 +153,15 @@ def serve_search_css(request):
     templates 폴더의 search.css 파일 서빙
     """
     css_path = os.path.join(settings.BASE_DIR, 'templates', 'search.css')
+    with open(css_path, 'r', encoding='utf-8') as f:
+        css_content = f.read()
+    return HttpResponse(css_content, content_type='text/css')
+
+def serve_chat_css(request):
+    """
+    templates 폴더의 chat.css 파일 서빙
+    """
+    css_path = os.path.join(settings.BASE_DIR, 'templates', 'chat.css')
     with open(css_path, 'r', encoding='utf-8') as f:
         css_content = f.read()
     return HttpResponse(css_content, content_type='text/css')
