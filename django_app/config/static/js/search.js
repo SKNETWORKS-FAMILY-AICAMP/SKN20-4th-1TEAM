@@ -23,10 +23,10 @@ function toggleSidebar() {
 function toggleDetailSearch() {
     const panel = document.getElementById('search-filter-panel');
     const btn = document.getElementById('toggle-detail-btn');
-    
+
     panel.classList.toggle('hidden');
     btn.classList.toggle('active');
-    
+
     if (btn.classList.contains('active')) {
         btn.innerHTML = `
             상세검색 닫기
@@ -45,40 +45,40 @@ function toggleDetailSearch() {
 }
 
 // ===== 태그 버튼 토글 (단일 선택) =====
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 각 filter-row의 태그 버튼들에 대해 단일 선택 기능 구현
     const filterRows = document.querySelectorAll('.filter-row');
-    
+
     filterRows.forEach(row => {
         const tagButtons = row.querySelectorAll('.tag-btn');
-        
+
         tagButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 // 같은 row 내의 다른 버튼들의 active 제거
                 tagButtons.forEach(otherBtn => {
                     otherBtn.classList.remove('active');
                 });
-                
+
                 // 현재 버튼에 active 추가
                 this.classList.add('active');
             });
         });
     });
-    
+
     // 검색창 Enter 키 이벤트
     const searchInput = document.querySelector('.main-search-input');
     if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 executeSearch();
             }
         });
     }
-    
+
     // 검색 버튼 클릭 이벤트
     const searchBtn = document.querySelector('.search-icon-btn');
     if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
+        searchBtn.addEventListener('click', function () {
             executeSearch();
         });
     }
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function autoFillUserInfo() {
     // TODO: 실제 구현 시 사용자 정보를 가져와서 입력
     alert('내 정보를 자동으로 입력합니다.');
-    
+
     // 예시: 더미 데이터 입력
     document.querySelector('.filter-select[value=""]').value = 'seoul';
     document.querySelector('input[type="number"].input-underline').value = '25';
@@ -98,49 +98,49 @@ function autoFillUserInfo() {
 function executeSearch() {
     // 검색어
     const searchQuery = document.querySelector('.main-search-input').value.trim();
-    
+
     // 마감제외 체크박스
     const excludeClosed = document.getElementById('exclude-closed').checked;
-    
+
     // 1. 지역 수집 (첫 번째 선택된 지역의 province 값 사용)
     let region = '';
     if (selectedRegionTags.length > 0) {
         region = selectedRegionTags[0].province; // 예: 'seoul', 'busan'
     }
-    
+
     // 2. 혼인여부
     const maritalStatusSelect = document.querySelectorAll('.filter-select')[0];
     const maritalStatus = maritalStatusSelect ? maritalStatusSelect.value : '';
-    
+
     // 3. 연령
     const ageInput = document.querySelector('input[type="number"].input-underline');
     const age = ageInput ? ageInput.value : '';
-    
+
     // 4. 연소득
     const incomeInputs = document.querySelectorAll('.range-inputs input[type="number"]');
     const incomeMin = incomeInputs[0] ? incomeInputs[0].value : '';
     const incomeMax = incomeInputs[1] ? incomeInputs[1].value : '';
-    
+
     // 5. 학력 (활성화된 태그 버튼들)
     const educationRow = document.querySelectorAll('.filter-row')[2]; // 3번째 filter-row
     const educationTags = Array.from(educationRow.querySelectorAll('.tag-btn.active'))
         .map(btn => btn.textContent.trim());
-    
+
     // 6. 전공요건
     const majorRow = document.querySelectorAll('.filter-row')[3]; // 4번째 filter-row
     const majorTags = Array.from(majorRow.querySelectorAll('.tag-btn.active'))
         .map(btn => btn.textContent.trim());
-    
+
     // 7. 취업상태
     const employmentRow = document.querySelectorAll('.filter-row')[4]; // 5번째 filter-row
     const employmentTags = Array.from(employmentRow.querySelectorAll('.tag-btn.active'))
         .map(btn => btn.textContent.trim());
-    
+
     // 8. 특화분야
     const specializationRow = document.querySelectorAll('.filter-row')[5]; // 6번째 filter-row
     const specializationTags = Array.from(specializationRow.querySelectorAll('.tag-btn.active'))
         .map(btn => btn.textContent.trim());
-    
+
     // API 요청 데이터 구성
     const requestData = {
         query: searchQuery,
@@ -155,9 +155,9 @@ function executeSearch() {
         employment_status: employmentTags,
         specialization: specializationTags
     };
-    
+
     console.log('검색 요청 데이터:', requestData);
-    
+
     // API 호출
     fetch('/chat/search-policy/', {
         method: 'POST',
@@ -166,20 +166,20 @@ function executeSearch() {
         },
         body: JSON.stringify(requestData)
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('검색 결과:', data);
-        if (data.error) {
-            alert('검색 중 오류가 발생했습니다: ' + data.error);
-        } else {
-            // 검색 결과 표시
-            displaySearchResults(data.results);
-        }
-    })
-    .catch(error => {
-        console.error('검색 오류:', error);
-        alert('검색 중 오류가 발생했습니다.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('검색 결과:', data);
+            if (data.error) {
+                alert('검색 중 오류가 발생했습니다: ' + data.error);
+            } else {
+                // 검색 결과 표시
+                displaySearchResults(data.results);
+            }
+        })
+        .catch(error => {
+            console.error('검색 오류:', error);
+            alert('검색 중 오류가 발생했습니다.');
+        });
 }
 
 // 전역 변수
@@ -191,14 +191,14 @@ let allResults = [];
 function displaySearchResults(results) {
     allResults = results;
     currentPage = 1;
-    
+
     // 검색 결과 섹션 표시
     const resultsSection = document.getElementById('search-results-section');
     resultsSection.classList.add('active');
-    
+
     // 결과 개수 업데이트
     document.getElementById('results-count').textContent = results.length;
-    
+
     // 결과 렌더링
     renderResults();
     renderPagination();
@@ -208,16 +208,16 @@ function displaySearchResults(results) {
 function renderResults() {
     const resultsGrid = document.getElementById('results-grid');
     resultsGrid.innerHTML = '';
-    
+
     const startIdx = (currentPage - 1) * itemsPerPage;
     const endIdx = startIdx + itemsPerPage;
     const pageResults = allResults.slice(startIdx, endIdx);
-    
+
     pageResults.forEach(policy => {
         const card = createPolicyCard(policy);
         resultsGrid.appendChild(card);
     });
-    
+
     // 결과로 스크롤
     resultsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -226,15 +226,15 @@ function renderResults() {
 function createPolicyCard(policy) {
     const card = document.createElement('div');
     card.className = 'policy-card';
-    
+
     // 마감 상태 계산
     const status = getPolicyStatus(policy.period, policy.period_type);
     const statusText = getStatusText(status);
     const statusClass = getStatusClass(status);
-    
+
     // 키워드 분리 (쉼표로 구분)
     const keywords = policy.keywords ? policy.keywords.split(',').slice(0, 3) : [];
-    
+
     card.innerHTML = `
         <div class="policy-status ${statusClass}">${statusText}</div>
         <div class="policy-category">${policy.category || '정책'}</div>
@@ -250,7 +250,7 @@ function createPolicyCard(policy) {
             ${keywords.map(kw => `<span class="keyword-tag">${kw.trim()}</span>`).join('')}
         </div>
     `;
-    
+
     return card;
 }
 
@@ -260,12 +260,12 @@ function getPolicyStatus(period, periodType) {
     if (periodType && periodType.includes('마감')) {
         return 'closed';
     }
-    
+
     // 신청기간구분이 상시/연중이면
     if (periodType && (periodType.includes('상시') || periodType.includes('연중'))) {
         return 'ongoing';
     }
-    
+
     // 신청기간이 없으면 신청기간구분 확인
     if (!period || period.trim() === '') {
         if (periodType && periodType.includes('특정기간')) {
@@ -273,15 +273,15 @@ function getPolicyStatus(period, periodType) {
         }
         return 'ongoing'; // 신청기간도 없고 특정기간도 아니면 진행중으로 간주
     }
-    
+
     const today = new Date();
     const todayStr = formatDateToYYYYMMDD(today);
-    
+
     // 신청기간에 상시/연중이 포함되어 있으면
     if (period.includes('상시') || period.includes('연중')) {
         return 'ongoing';
     }
-    
+
     // 여러 기간이 있을 수 있으므로 모든 종료일 추출
     const matches = period.match(/~\s*(\d{8})/g);
     if (matches && matches.length > 0) {
@@ -290,22 +290,22 @@ function getPolicyStatus(period, periodType) {
         // 가장 마지막 종료일
         const latestEndDate = Math.max(...endDates.map(d => parseInt(d)));
         const endDateStr = latestEndDate.toString();
-        
+
         if (endDateStr < todayStr) {
             return 'closed'; // 마감
         }
-        
+
         // 마감 7일 전
         const endDateObj = parseYYYYMMDD(endDateStr);
         const daysUntilEnd = Math.floor((endDateObj - today) / (1000 * 60 * 60 * 24));
-        
+
         if (daysUntilEnd <= 7) {
             return 'deadline-soon'; // 마감임박
         }
-        
+
         return 'ongoing'; // 진행중
     }
-    
+
     return 'unknown';
 }
 
@@ -350,19 +350,19 @@ function formatPeriod(period, periodType) {
         }
         return '미정';
     }
-    
+
     // 상시/연중이면 그대로 표시
     if (period.includes('상시') || period.includes('연중')) {
         return period;
     }
-    
+
     // YYYYMMDD 형식을 YYYY.MM.DD로 변환
     // \N 또는 줄바꿈은 " / "로 구분
     const formatted = period
         .replace(/\\N/g, ' / ')
         .replace(/\n/g, ' / ')
         .replace(/(\d{4})(\d{2})(\d{2})/g, '$1.$2.$3');
-    
+
     return formatted;
 }
 
@@ -370,11 +370,11 @@ function formatPeriod(period, periodType) {
 function renderPagination() {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = '';
-    
+
     const totalPages = Math.ceil(allResults.length / itemsPerPage);
-    
+
     if (totalPages <= 1) return;
-    
+
     // 이전 버튼
     const prevBtn = document.createElement('button');
     prevBtn.className = 'pagination-btn';
@@ -382,11 +382,11 @@ function renderPagination() {
     prevBtn.disabled = currentPage === 1;
     prevBtn.onclick = () => changePage(currentPage - 1);
     pagination.appendChild(prevBtn);
-    
+
     // 페이지 번호 버튼
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, startPage + 4);
-    
+
     for (let i = startPage; i <= endPage; i++) {
         const pageBtn = document.createElement('button');
         pageBtn.className = 'pagination-btn';
@@ -397,7 +397,7 @@ function renderPagination() {
         pageBtn.onclick = () => changePage(i);
         pagination.appendChild(pageBtn);
     }
-    
+
     // 다음 버튼
     const nextBtn = document.createElement('button');
     nextBtn.className = 'pagination-btn';
@@ -411,7 +411,7 @@ function renderPagination() {
 function changePage(page) {
     const totalPages = Math.ceil(allResults.length / itemsPerPage);
     if (page < 1 || page > totalPages) return;
-    
+
     currentPage = page;
     renderResults();
     renderPagination();
@@ -428,20 +428,20 @@ function viewPolicyDetail(policyId) {
 function resetFilters() {
     // 검색어 초기화
     document.querySelector('.main-search-input').value = '';
-    
+
     // 체크박스 초기화
     document.getElementById('exclude-closed').checked = false;
-    
+
     // 셀렉트 박스들 초기화
     document.querySelectorAll('.filter-select').forEach(select => {
         select.selectedIndex = 0;
     });
-    
+
     // 숫자 입력 필드들 초기화
     document.querySelectorAll('input[type="number"]').forEach(input => {
         input.value = '';
     });
-    
+
     // 태그 버튼들 초기화 (각 섹션의 첫 번째 버튼 활성화)
     document.querySelectorAll('.filter-row').forEach(row => {
         const tagButtons = row.querySelectorAll('.tag-btn');
@@ -453,12 +453,12 @@ function resetFilters() {
             }
         });
     });
-    
+
     // 지역 선택 초기화
     selectedRegionTags = [];
     currentProvince = null;
     document.getElementById('selected-region-text').textContent = '선택하세요.';
-    
+
     // 지역 모달 내부 상태 초기화
     document.querySelectorAll('#province-list .region-item-clickable').forEach(item => {
         item.classList.remove('active');
@@ -473,7 +473,7 @@ function resetFilters() {
 // ===== 네비게이션 기능들 =====
 function handleNewChat() {
     // TODO: chat.html 파일이 만들어지면 해당 URL로 변경
-    window.location.href = '/chat/';
+    window.location.href = '/chat/chat/';
 }
 
 // ===== 이용 가이드 모달 =====
@@ -484,12 +484,12 @@ function openHelpModal() {
 
 function closeHelpModal(event) {
     const modal = document.getElementById('help-modal');
-    
+
     // 이벤트가 있고, 모달 내부 클릭이면 닫지 않음
     if (event && event.target !== modal) {
         return;
     }
-    
+
     modal.classList.remove('active');
 }
 
@@ -525,30 +525,30 @@ function openRegionModal() {
 
 function closeRegionModal(event) {
     const modal = document.getElementById('region-modal');
-    
+
     if (event && event.target !== modal) {
         return;
     }
-    
+
     modal.classList.remove('active');
 }
 
 // 시/도 클릭 시
 function selectProvinceClick(province, provinceName) {
     currentProvince = { value: province, name: provinceName };
-    
+
     // 왼쪽 컬럼 활성화 표시
     document.querySelectorAll('#province-list .region-item-clickable').forEach(item => {
         item.classList.remove('active');
     });
     document.querySelector(`#province-list .region-item-clickable[data-value="${province}"]`).classList.add('active');
-    
+
     // 오른쪽 컬럼 업데이트
     const districtList = document.getElementById('district-list');
     const districtTitle = document.querySelector('.region-column:nth-child(2) .region-column-title');
-    
+
     districtTitle.textContent = provinceName;
-    
+
     if (regionData[province]) {
         districtList.innerHTML = regionData[province].map(district => `
             <div class="region-item-clickable" data-province="${province}" data-district="${district}" onclick="selectDistrictClick('${province}', '${provinceName}', '${district}')">
@@ -562,12 +562,12 @@ function selectProvinceClick(province, provinceName) {
 function selectDistrictClick(province, provinceName, district) {
     // 선택된 지역 추가
     const displayText = district === '전체' ? provinceName : `${provinceName} ${district}`;
-    
+
     // 중복 체크
-    const exists = selectedRegionTags.find(tag => 
+    const exists = selectedRegionTags.find(tag =>
         tag.province === province && tag.district === district
     );
-    
+
     if (!exists) {
         selectedRegionTags.push({
             province: province,
@@ -575,7 +575,7 @@ function selectDistrictClick(province, provinceName, district) {
             district: district,
             display: displayText
         });
-        
+
         updateSelectedRegionsDisplay();
     }
 }
@@ -583,7 +583,7 @@ function selectDistrictClick(province, provinceName, district) {
 // 선택된 지역 표시 업데이트
 function updateSelectedRegionsDisplay() {
     const selectedDisplay = document.getElementById('selected-regions-display');
-    
+
     if (selectedRegionTags.length === 0) {
         selectedDisplay.innerHTML = '';
     } else {
@@ -606,25 +606,25 @@ function removeSelectedRegionTag(index) {
 function resetRegionSelection() {
     selectedRegionTags = [];
     currentProvince = null;
-    
+
     // 왼쪽 컬럼 활성화 제거
     document.querySelectorAll('#province-list .region-item-clickable').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     // 오른쪽 컬럼 초기화
     const districtList = document.getElementById('district-list');
     const districtTitle = document.querySelector('.region-column:nth-child(2) .region-column-title');
     districtList.innerHTML = '';
     districtTitle.textContent = '전체';
-    
+
     updateSelectedRegionsDisplay();
 }
 
 // 적용하기
 function applyRegionSelection() {
     const selectedText = document.getElementById('selected-region-text');
-    
+
     if (selectedRegionTags.length === 0) {
         selectedText.textContent = '선택하세요.';
     } else if (selectedRegionTags.length === 1) {
@@ -633,19 +633,19 @@ function applyRegionSelection() {
         const firstRegion = selectedRegionTags[0].display;
         selectedText.textContent = `${firstRegion} 외 ${selectedRegionTags.length - 1}곳`;
     }
-    
+
     closeRegionModal();
 }
 
 // ===== 반응형: 화면 크기 변경 감지 =====
 let resizeTimer;
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function() {
+    resizeTimer = setTimeout(function () {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         const body = document.body;
-        
+
         if (window.innerWidth > 768) {
             // 데스크탑 모드로 전환 시 모바일 스타일 제거
             sidebar.classList.remove('open');
@@ -658,11 +658,11 @@ window.addEventListener('resize', function() {
 });
 
 // ===== 엔터키로 검색 실행 =====
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.querySelector('.main-search-input');
-    
+
     if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 executeSearch();
             }

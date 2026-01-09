@@ -397,8 +397,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Enter 키로 메시지 전송 (Shift+Enter는 줄바꿈)
+        // Mac 한글 입력 시 이중 전송 방지를 위해 isComposing 체크
         messageInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
                 e.preventDefault();
                 sendMessage();
             }
@@ -697,3 +698,26 @@ document.addEventListener('click', function (e) {
 document.addEventListener('DOMContentLoaded', function () {
     loadChatHistory();
 });
+
+// 검색 페이지로 이동
+function goToSearch() {
+    const overlay = document.getElementById('transition-overlay');
+    const card = document.getElementById('transition-card');
+
+    if (overlay && card) {
+        // 1. 레이어 표시
+        overlay.style.display = 'block';
+
+        // 2. 회전 애니메이션 시작
+        setTimeout(() => {
+            card.style.transform = 'rotateY(180deg)';
+        }, 50);
+
+        // 3. 페이지 이동
+        setTimeout(() => {
+            window.location.href = '/chat/search/';
+        }, 1200);
+    } else {
+        window.location.href = '/chat/search/';
+    }
+}
