@@ -422,3 +422,51 @@ def search_policy(request):
     except Exception as e:
         print(f"Search Error: {e}")
         return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def get_policy_detail(request, policy_id):
+    """
+    정책 상세 정보 조회 API
+    """
+    try:
+        policy = Policy.objects.get(policy_id=policy_id)
+        
+        data = {
+            "policy_id": str(policy.policy_id),
+            "title": policy.title,
+            "keywords": policy.keywords,
+            "description": policy.description,
+            "category_major": policy.category_major,
+            "category_middle": policy.category_middle,
+            "support_content": policy.support_content,
+            "min_support_amount": policy.min_support_amount,
+            "max_support_amount": policy.max_support_amount,
+            "age_min": policy.age_min,
+            "age_max": policy.age_max,
+            "application_period": policy.application_period,
+            "period_type": policy.period_type,
+            "application_method": policy.application_method,
+            "required_documents": policy.required_documents,
+            "selection_method": policy.selection_method,
+            "ref_url1": policy.ref_url1,
+            "ref_url2": policy.ref_url2,
+            "marital_status": policy.marital_status,
+            "income_condition": policy.income_condition,
+            "major_requirement": policy.major_requirement,
+            "employment_status": policy.employment_status,
+            "education_requirement": policy.education_requirement,
+            "specialization": policy.specialization,
+            "region": policy.region,
+            "hosting_org": policy.hosting_org,
+            "registering_org": policy.registering_org,
+            "parent_org": policy.parent_org,
+            "parent_registering_org": policy.parent_registering_org
+        }
+        
+        return JsonResponse(data)
+        
+    except Policy.DoesNotExist:
+        return JsonResponse({"error": "정책을 찾을 수 없습니다."}, status=404)
+    except Exception as e:
+        print(f"Policy Detail Error: {e}")
+        return JsonResponse({"error": str(e)}, status=500)

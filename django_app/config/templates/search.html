@@ -344,6 +344,153 @@
         </div>
     </div>
 
+    <!-- ===== 정책 상세보기 모달 ===== -->
+    <div class="modal-overlay" id="policy-detail-modal" onclick="closePolicyDetailModal(event)">
+        <div class="modal-content policy-detail-content" onclick="event.stopPropagation()">
+            
+            <div class="modal-body policy-detail-body">
+                <!-- 닫기 버튼 (모달 내부 오른쪽 상단) -->
+                <button class="policy-modal-close-btn" onclick="closePolicyDetailModal()">&times;</button>
+                
+                <!-- 로딩 상태 -->
+                <div class="loading-spinner" id="policy-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>정책 정보를 불러오는 중...</p>
+                </div>
+
+                <!-- 정책 내용 -->
+                <div id="policy-detail-content" style="display: none;">
+                    <!-- 헤더: 대분류, 마감여부 -->
+                    <div class="policy-detail-header">
+                        <div class="policy-meta">
+                            <span class="policy-category-badge" id="detail-category"></span>
+                            <span class="policy-status-badge" id="detail-status"></span>
+                        </div>
+                        <h3 class="policy-detail-title" id="detail-title"></h3>
+                        <div class="policy-keywords" id="detail-keywords"></div>
+                        <p class="policy-middle-category" id="detail-middle-category"></p>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="detail-divider"></div>
+
+                    <!-- 정책 설명 -->
+                    <div class="policy-detail-section">
+                        <h4 class="section-title">📋 정책 설명</h4>
+                        <p class="section-content" id="detail-description"></p>
+                    </div>
+
+                    <div class="detail-divider"></div>
+
+                    <!-- 지원 정보 -->
+                    <div class="policy-detail-section">
+                        <h4 class="section-title">💰 지원 정보</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">지원 내용:</span>
+                                <span class="info-value" id="detail-support-content"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">지원 연령:</span>
+                                <span class="info-value" id="detail-age-range"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">지원 금액:</span>
+                                <span class="info-value" id="detail-amount-range"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">신청 기간:</span>
+                                <span class="info-value" id="detail-period"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">신청 방법:</span>
+                                <span class="info-value" id="detail-application-method"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">제출 서류:</span>
+                                <span class="info-value" id="detail-documents"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">선정 방법:</span>
+                                <span class="info-value" id="detail-selection"></span>
+                            </div>
+                            <div class="info-item" id="detail-url1-container" style="display: none;">
+                                <span class="info-label">참고 URL 1:</span>
+                                <a class="info-link" id="detail-url1" href="#" target="_blank"></a>
+                            </div>
+                            <div class="info-item" id="detail-url2-container" style="display: none;">
+                                <span class="info-label">참고 URL 2:</span>
+                                <a class="info-link" id="detail-url2" href="#" target="_blank"></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-divider"></div>
+
+                    <!-- 자격 요건 -->
+                    <div class="policy-detail-section">
+                        <h4 class="section-title">✅ 자격 요건</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">혼인 상태:</span>
+                                <span class="info-value" id="detail-marital-status"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">소득 조건:</span>
+                                <span class="info-value" id="detail-income"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">전공 요건:</span>
+                                <span class="info-value" id="detail-major"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">취업 상태:</span>
+                                <span class="info-value" id="detail-employment"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">학력 요건:</span>
+                                <span class="info-value" id="detail-education"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">특화 분야:</span>
+                                <span class="info-value" id="detail-specialization"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">지역:</span>
+                                <span class="info-value" id="detail-region"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-divider"></div>
+
+                    <!-- 운영 기관 -->
+                    <div class="policy-detail-section">
+                        <h4 class="section-title">🏢 운영 기관</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">주관 기관:</span>
+                                <span class="info-value" id="detail-hosting-org"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">등록 기관:</span>
+                                <span class="info-value" id="detail-registering-org"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">상위 기관:</span>
+                                <span class="info-value" id="detail-parent-org"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">상위 등록 기관:</span>
+                                <span class="info-value" id="detail-parent-registering-org"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== JAVASCRIPT ===== -->
     <script src="{% static 'js/search.js' %}"></script>
 </body>
