@@ -75,8 +75,9 @@ async function sendMessage() {
     currentAbortController = new AbortController();
     sendBtn.classList.add('sending'); // 아이콘 변경 (비행기 -> 네모)
 
-    // 1. 사용자 메시지 표시
+    // 1. 사용자 메시지 표시 + localStorage 저장
     addMessage(message, 'user');
+    saveMessage('user', message);
 
     // 2. [추가] 내가 보낸 질문이 바로 보이도록 스크롤 내리기
     const container = document.getElementById('chat-container');
@@ -105,9 +106,10 @@ async function sendMessage() {
 
         const data = await response.json();
 
-        // 로딩 메시지 제거 후 봇 응답 표시
+        // 로딩 메시지 제거 후 봇 응답 표시 + localStorage 저장
         removeLoadingMessage(loadingId);
         addMessage(data.answer, 'bot');
+        saveMessage('bot', data.answer);
 
     } catch (error) {
         removeLoadingMessage(loadingId);
@@ -209,27 +211,12 @@ let currentConversationId = null;
 // ==========================================
 // 헤더 버튼 기능
 // ==========================================
-async function handleNewChat() {
+function handleNewChat() {
     console.log('새 채팅 버튼 클릭');
     if (confirm('새로운 채팅을 시작하시겠습니까?')) {
-        try {
-            // 백엔드에 새 대화 생성 요청
-            const response = await fetch(`${API_BASE_URL}/chat/new/`, {
-                method: 'POST'
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                currentConversationId = data.conversation_id || null;
-                console.log('새 대화 생성:', currentConversationId);
-            }
-        } catch (error) {
-            console.error('새 대화 생성 실패:', error);
-            // API 실패해도 화면은 초기화
-        }
-
+        setCurrentChatId(null); // 현재 대화 초기화
         showChatPlaceholder(); // 냥이 표시 및 채팅 초기화
-        loadChatHistory(); // 채팅 목록 새로고침
+        loadChatHistory(); // 목록 갱신 (활성 상태 업데이트)
     }
 }
 
@@ -461,38 +448,152 @@ function setInputValue(text) {
 }
 
 // ==========================================
-// 채팅 기록 관리 함수들
+// 채팅 기록 관리 - localStorage 기반
 // ==========================================
 
-/**
- * 채팅 기록 목록 불러오기
- */
-async function loadChatHistory() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/chat/list/`);
+const STORAGE_KEY_CHAT_LIST = 'youth_chat_list';
+const STORAGE_KEY_CURRENT_ID = 'youth_current_chat_id';
+const MAX_CHAT_COUNT = 20;
 
-        if (response.ok) {
-            const data = await response.json();
-            renderChatList(data.conversations || []);
-        } else {
-            console.log('채팅 기록 API 미구현 (백엔드 연동 필요)');
-            renderChatList([]); // 빈 목록 표시
-        }
-    } catch (error) {
-        console.error('채팅 기록 불러오기 실패:', error);
-        renderChatList([]); // 에러 시 빈 목록
+/**
+ * localStorage에서 채팅 목록 가져오기
+ * @returns {Array} 대화 목록
+ */
+function getChatList() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY_CHAT_LIST);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        console.error('채팅 목록 로드 실패:', e);
+        return [];
     }
 }
 
 /**
+ * localStorage에 채팅 목록 저장
+ * @param {Array} list - 저장할 대화 목록
+ */
+function saveChatList(list) {
+    try {
+        localStorage.setItem(STORAGE_KEY_CHAT_LIST, JSON.stringify(list));
+    } catch (e) {
+        console.error('채팅 목록 저장 실패:', e);
+        // 용량 부족 시 오래된 대화 삭제 후 재시도
+        if (e.name === 'QuotaExceededError') {
+            autoCleanOldChats(true);
+            try {
+                localStorage.setItem(STORAGE_KEY_CHAT_LIST, JSON.stringify(list));
+            } catch (e2) {
+                console.error('용량 정리 후에도 저장 실패:', e2);
+            }
+        }
+    }
+}
+
+/**
+ * 현재 활성 대화 ID 가져오기
+ */
+function getCurrentChatId() {
+    return localStorage.getItem(STORAGE_KEY_CURRENT_ID);
+}
+
+/**
+ * 현재 활성 대화 ID 설정
+ */
+function setCurrentChatId(id) {
+    if (id) {
+        localStorage.setItem(STORAGE_KEY_CURRENT_ID, id);
+    } else {
+        localStorage.removeItem(STORAGE_KEY_CURRENT_ID);
+    }
+    currentConversationId = id;
+}
+
+/**
+ * 새 대화 생성
+ * @returns {Object} 새로 생성된 대화 객체
+ */
+function createNewChat() {
+    const newChat = {
+        id: 'chat_' + Date.now(),
+        title: null, // 첫 질문 시 설정됨
+        createdAt: new Date().toISOString(),
+        messages: []
+    };
+
+    const list = getChatList();
+    list.unshift(newChat); // 맨 앞에 추가
+    saveChatList(list);
+    setCurrentChatId(newChat.id);
+
+    return newChat;
+}
+
+/**
+ * 현재 대화에 메시지 저장
+ * @param {string} role - 'user' 또는 'bot'
+ * @param {string} content - 메시지 내용
+ */
+function saveMessage(role, content) {
+    let list = getChatList();
+    let chatId = getCurrentChatId();
+
+    // 현재 대화가 없으면 새로 생성
+    if (!chatId) {
+        const newChat = createNewChat();
+        chatId = newChat.id;
+        list = getChatList();
+    }
+
+    const chatIndex = list.findIndex(c => c.id === chatId);
+    if (chatIndex === -1) {
+        // 목록에 없으면 새로 생성
+        const newChat = createNewChat();
+        list = getChatList();
+        const newIndex = list.findIndex(c => c.id === newChat.id);
+        if (newIndex !== -1) {
+            list[newIndex].messages.push({ role, content });
+            // 첫 사용자 메시지를 제목으로 설정
+            if (role === 'user' && !list[newIndex].title) {
+                list[newIndex].title = content.length > 30
+                    ? content.substring(0, 30) + '...'
+                    : content;
+            }
+            saveChatList(list);
+            loadChatHistory(); // 목록 갱신
+        }
+        return;
+    }
+
+    list[chatIndex].messages.push({ role, content });
+
+    // 첫 사용자 메시지를 제목으로 설정
+    if (role === 'user' && !list[chatIndex].title) {
+        list[chatIndex].title = content.length > 30
+            ? content.substring(0, 30) + '...'
+            : content;
+    }
+
+    saveChatList(list);
+    loadChatHistory(); // 목록 갱신
+}
+
+/**
+ * 채팅 기록 목록 불러오기 및 렌더링
+ */
+function loadChatHistory() {
+    const conversations = getChatList();
+    renderChatList(conversations);
+}
+
+/**
  * 채팅 목록을 사이드바에 동적 렌더링
- * @param {Array} conversations - [{id, title, createdAt}, ...]
+ * @param {Array} conversations - 대화 목록
  */
 function renderChatList(conversations) {
     const listContainer = document.getElementById('chat-history-list');
     if (!listContainer) return;
 
-    // 목록 비우기
     listContainer.innerHTML = '';
 
     if (conversations.length === 0) {
@@ -500,12 +601,13 @@ function renderChatList(conversations) {
         return;
     }
 
+    const currentId = getCurrentChatId();
+
     conversations.forEach(conv => {
         const li = document.createElement('li');
-        li.className = 'history-item' + (conv.id === currentConversationId ? ' active' : '');
+        li.className = 'history-item' + (conv.id === currentId ? ' active' : '');
         li.dataset.conversationId = conv.id;
 
-        // 제목 축약 (20자 초과 시 ...)
         const title = conv.title && conv.title.length > 20
             ? conv.title.substring(0, 20) + '...'
             : (conv.title || '새 대화');
@@ -543,118 +645,106 @@ function renderChatList(conversations) {
 
 /**
  * 특정 대화 불러오기
- * @param {string} conversationId - 대화 ID
+ * @param {string} chatId - 대화 ID
  */
-async function loadConversation(conversationId) {
-    // 현재 활성 대화 변경
-    currentConversationId = conversationId;
+function loadConversation(chatId) {
+    const list = getChatList();
+    const chat = list.find(c => c.id === chatId);
 
-    // 활성 상태 UI 업데이트
+    if (!chat) {
+        console.error('대화를 찾을 수 없습니다:', chatId);
+        return;
+    }
+
+    setCurrentChatId(chatId);
+
+    // UI 활성 상태 업데이트
     document.querySelectorAll('.history-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.conversationId === conversationId);
+        item.classList.toggle('active', item.dataset.conversationId === chatId);
     });
 
-    // 드롭다운 닫기
     closeAllDropdowns();
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/chat/${conversationId}/`);
+    // 채팅 영역 초기화 및 메시지 표시
+    const container = document.getElementById('chat-container');
+    container.innerHTML = '';
+    hideChatPlaceholder();
 
-        if (response.ok) {
-            const data = await response.json();
-
-            // 채팅 영역 초기화
-            const container = document.getElementById('chat-container');
-            container.innerHTML = '';
-            hideChatPlaceholder();
-
-            // 대화 내용 렌더링
-            if (data.messages && data.messages.length > 0) {
-                data.messages.forEach(msg => {
-                    addMessage(msg.content, msg.role); // role: 'user' or 'bot'
-                });
-            }
-
-            console.log('대화 불러오기 완료:', conversationId);
-        } else {
-            console.log('대화 불러오기 API 미구현 (백엔드 연동 필요)');
-        }
-    } catch (error) {
-        console.error('대화 불러오기 실패:', error);
+    if (chat.messages && chat.messages.length > 0) {
+        chat.messages.forEach(msg => {
+            addMessage(msg.content, msg.role);
+        });
+        container.scrollTop = container.scrollHeight;
     }
+
+    console.log('대화 불러오기 완료:', chatId);
 }
 
 /**
  * 채팅방 이름 수정
- * @param {string} conversationId - 대화 ID
+ * @param {string} chatId - 대화 ID
  */
-async function renameChat(conversationId) {
+function renameChat(chatId) {
     closeAllDropdowns();
 
-    const newName = prompt('새 이름을 입력하세요:');
+    const list = getChatList();
+    const chatIndex = list.findIndex(c => c.id === chatId);
+
+    if (chatIndex === -1) return;
+
+    const currentTitle = list[chatIndex].title || '';
+    const newName = prompt('새 이름을 입력하세요:', currentTitle);
+
     if (!newName || !newName.trim()) return;
 
-    try {
-        const formData = new FormData();
-        formData.append('title', newName.trim());
+    list[chatIndex].title = newName.trim();
+    saveChatList(list);
+    loadChatHistory();
 
-        const response = await fetch(`${API_BASE_URL}/chat/${conversationId}/rename/`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            console.log('이름 수정 완료');
-            loadChatHistory(); // 목록 새로고침
-        } else {
-            console.log('이름 수정 API 미구현 (백엔드 연동 필요)');
-            // UI만 업데이트 (임시)
-            const titleEl = document.querySelector(`[data-conversation-id="${conversationId}"] .history-title`);
-            if (titleEl) {
-                titleEl.textContent = newName.trim().length > 20
-                    ? newName.trim().substring(0, 20) + '...'
-                    : newName.trim();
-            }
-        }
-    } catch (error) {
-        console.error('이름 수정 실패:', error);
-    }
+    console.log('이름 수정 완료:', chatId);
 }
 
 /**
  * 채팅방 삭제
- * @param {string} conversationId - 대화 ID
+ * @param {string} chatId - 대화 ID
  */
-async function deleteChat(conversationId) {
+function deleteChat(chatId) {
     closeAllDropdowns();
 
     if (!confirm('이 대화를 삭제하시겠습니까?')) return;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/chat/${conversationId}/delete/`, {
-            method: 'POST'
-        });
+    let list = getChatList();
+    list = list.filter(c => c.id !== chatId);
+    saveChatList(list);
 
-        if (response.ok) {
-            console.log('대화 삭제 완료');
-        } else {
-            console.log('삭제 API 미구현 (백엔드 연동 필요)');
-        }
+    // 현재 보던 대화였으면 초기화
+    if (getCurrentChatId() === chatId) {
+        setCurrentChatId(null);
+        showChatPlaceholder();
+    }
 
-        // UI에서 제거
-        const item = document.querySelector(`[data-conversation-id="${conversationId}"]`);
-        if (item) {
-            item.remove();
-        }
+    loadChatHistory();
+    console.log('대화 삭제 완료:', chatId);
+}
 
-        // 현재 보던 대화였으면 초기화
-        if (currentConversationId === conversationId) {
-            currentConversationId = null;
-            showChatPlaceholder();
-        }
+/**
+ * 오래된 대화 자동 삭제
+ * @param {boolean} force - 즉시 삭제 여부 (용량 부족 시)
+ */
+function autoCleanOldChats(force = false) {
+    let list = getChatList();
 
-    } catch (error) {
-        console.error('대화 삭제 실패:', error);
+    // 20개 초과 시 오래된 것부터 삭제
+    if (list.length > MAX_CHAT_COUNT || force) {
+        // createdAt 기준 정렬 (최신 먼저)
+        list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // 상위 20개만 유지
+        const toKeep = force ? MAX_CHAT_COUNT - 5 : MAX_CHAT_COUNT;
+        list = list.slice(0, toKeep);
+
+        saveChatList(list);
+        console.log(`오래된 대화 정리 완료. 현재 ${list.length}개 유지.`);
     }
 }
 
@@ -694,9 +784,10 @@ document.addEventListener('click', function (e) {
     }
 });
 
-// 페이지 로드 시 채팅 기록 불러오기
+// 페이지 로드 시 채팅 기록 불러오기 + 오래된 대화 정리
 document.addEventListener('DOMContentLoaded', function () {
-    loadChatHistory();
+    autoCleanOldChats(); // 20개 초과 시 오래된 대화 삭제
+    loadChatHistory(); // 사이드바에 대화 목록 렌더링
 });
 
 // 검색 페이지로 이동
