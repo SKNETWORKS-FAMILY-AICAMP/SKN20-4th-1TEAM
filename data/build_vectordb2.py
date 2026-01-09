@@ -82,7 +82,7 @@ def get_embeddings_batch(texts, model="text-embedding-3-small"):
 # -------------------------------
 # 3️⃣ ChromaDB 구축
 # -------------------------------
-def build_chromadb(policies, db_path="data/vectordb2"):
+def build_chromadb(policies, db_path="./vectordb2"):
     os.makedirs(db_path, exist_ok=True)
     chroma = chromadb.PersistentClient(path=db_path)
 
@@ -163,7 +163,11 @@ def main():
         return
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_path = os.path.join(current_dir, "data", "processed", "youth_policies_filtered_kr_revised2.json")
+    data_path = os.path.join(current_dir, "youth_policies_filtered_kr_revised2.json")
+
+    if not os.path.exists(data_path):
+        print(f"파일을 찾을 수 없습니다: {data_path}")
+        return
 
     policies = load_preprocessed_data(data_path)
     print(f"Loaded {len(policies)} policies")
