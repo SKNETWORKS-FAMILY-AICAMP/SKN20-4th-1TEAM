@@ -1,4 +1,4 @@
-# 청년 정책 AI 챗봇 서비스 (Youth Policy AI Chatbot)
+<img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/da1ed668-bfe6-4146-8a23-32c9c1715b06" /># 청년 정책 AI 챗봇 서비스 (Youth Policy AI Chatbot)
 
 AI 기반의 청년 정책 추천 및 검색 시스템으로, 사용자의 질문에 대해 실시간으로 맞춤형 청년 정책을 추천하고 검색할 수 있는 챗봇
 
@@ -210,3 +210,23 @@ class Policy(models.Model):
 - **포함 정보**: 정책명, 지원 내용, 신청 기간, 연령 제한, 지원금액 등
 
 ---
+
+## 🖥️ 실행 화면
+
+---
+
+## 🌐 브라우저 실행 방법
+
+1. Django 서버를 실행합니다.
+    ```bash
+    cd django_app/config
+    python manage.py runserver
+    ```
+
+2. 웹 브라우저를 열고 아래 주소로 접속합니다.
+    - 메인 페이지: http://127.0.0.1:8000/
+    - 검색 페이지: http://127.0.0.1:8000/search/
+    - 챗봇 페이지: http://127.0.0.1:8000/chat/
+
+3. 각 페이지에서 정책 검색 및 AI 챗봇 기능을 사용할 수 있습니다.
+
