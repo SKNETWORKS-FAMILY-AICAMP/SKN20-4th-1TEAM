@@ -213,13 +213,13 @@ class Policy(models.Model):
 
 ## 🖥️ 실행 화면
 
-### 1. 메인 페이지
+#### 1. Main
 <img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/da1ed668-bfe6-4146-8a23-32c9c1715b06" />
 
-### 2. 채팅 페이지
+#### 2. Chat
 <img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/0695eae2-1f1f-49bf-99a9-db08e96cc249" />
 
-### 3. 검색 페이지
+#### 3. Search
 <img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/4acbdc90-de2b-4ebd-86a3-f0e71a68d8da" />
 <img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/40fac241-0e70-4dbd-978a-9d72dc059ec7" />
 
