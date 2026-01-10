@@ -38,7 +38,7 @@ AI 기반의 청년 정책 추천 및 검색 시스템으로, 사용자의 질�
 - RAG 기술을 활용한 정확한 정책 답변 제공
 - 세션 기반 사용자 관리로 대화 이력 저장
 
-### 2. **정책 검색 시스템**
+### 2. **정책 검색 시스템 ( NEW )**
 - 정책명, 키워드, 분류별 검색
 - 나이, 지원금액 범위 등 필터링 기능
 - 빠른 검색 응답 속도
@@ -154,6 +154,11 @@ GET /search/
 - **응답**: HTML 페이지
 
 ---
+## 🏙️ 시스템 아키텍처
+
+아키텍처 넣어야함 !
+
+---
 
 ## 🗄️ 데이터베이스 스키마
 
@@ -211,18 +216,9 @@ class Policy(models.Model):
 
 ---
 
-## 🖥️ 실행 화면
+## 📊 성능 지표
 
-#### 1. Main
-<img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/da1ed668-bfe6-4146-8a23-32c9c1715b06" />
-
-#### 2. Chat
-<img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/0695eae2-1f1f-49bf-99a9-db08e96cc249" />
-
-#### 3. Search
-<img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/4acbdc90-de2b-4ebd-86a3-f0e71a68d8da" />
-<img width="1352" height="718" alt="image" src="https://github.com/user-attachments/assets/40fac241-0e70-4dbd-978a-9d72dc059ec7" />
-
+성능 결과 !!!
 
 ---
 
