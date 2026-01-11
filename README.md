@@ -141,7 +141,8 @@ SKN20-4th-1TEAM/
 
 ## 🏙️ 시스템 아키텍처
 
-아키텍처 이미지 넣어야함 !
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/d7dcaa72-61f7-4034-8a37-d592e79d6257" />
+
 
 ---
 
