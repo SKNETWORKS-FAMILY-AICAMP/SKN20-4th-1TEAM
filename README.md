@@ -141,7 +141,8 @@ SKN20-4th-1TEAM/
 
 ## 🏙️ 시스템 아키텍처
 
- <img width="1105" height="608" alt="image" src="https://github.com/user-attachments/assets/f2e3eab2-2fd8-4948-b096-7c88f06bfacb" />
+ <img width="1337" height="608" alt="image" src="https://github.com/user-attachments/assets/1b612d45-87dd-459e-a4fa-9a25d505fe87" />
+
 
 
 
